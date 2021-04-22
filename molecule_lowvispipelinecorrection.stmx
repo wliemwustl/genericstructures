@@ -1,0 +1,450 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xmile version="1.0" xmlns="http://docs.oasis-open.org/xmile/ns/XMILE/v1.0" xmlns:isee="http://iseesystems.com/XMILE">
+	<header>
+		<smile version="1.0" namespace="std, isee"/>
+		<name>molecule_lowvispipelinecorrection</name>
+		<uuid>115be552-1da9-4271-b367-80d05e6ebb3b</uuid>
+		<vendor>isee systems, inc.</vendor>
+		<product version="2.0.1" isee:build_number="2228" isee:saved_by_v1="true" lang="en">Stella Architect</product>
+	</header>
+	<sim_specs isee:sim_duration="1.4375" isee:simulation_delay="0.0625" isee:restore_on_start="false" method="Euler" time_units="Quarter" isee:instantaneous_flows="true" isee:loop_scores="true" isee:loop_exhaustive_allowed="1000">
+		<start>1</start>
+		<stop>24</stop>
+		<dt reciprocal="true">25</dt>
+	</sim_specs>
+	<isee:prefs show_module_prefix="true" live_update_on_drag="true" show_restore_buttons="false" layer="model" interface_scale_ui="true" interface_max_page_width="10000" interface_max_page_height="10000" interface_min_page_width="0" interface_min_page_height="0" rerun_on_structure_change="false" saved_runs="5" keep="false" rifp="true"/>
+	<isee:multiplayer_settings include_chat="true" allow_observers="false" advance_time_increment="1" observer_start_page="home_page" enabled="false"/>
+	<isee:time_formats default_format="Builtin">
+		<isee:time_format name="Builtin" type="adaptive"/>
+	</isee:time_formats>
+	<default_format/>
+	<model_units>
+		<unit name="Quarters">
+			<eqn/>
+			<alias>qtr</alias>
+			<alias>quarter</alias>
+		</unit>
+		<unit name="Dimensionless">
+			<eqn>1</eqn>
+			<alias>dmnl</alias>
+			<alias>unitless</alias>
+		</unit>
+	</model_units>
+	<model>
+		<isee:extra_collection_variables>
+			<isee:extra_collection_variable name="Orders_being_filled"/>
+			<isee:extra_collection_variable name="Inventory"/>
+			<isee:extra_collection_variable name="Orders_not_received"/>
+			<isee:extra_collection_variable name="Shipping"/>
+			<isee:extra_collection_variable name="Ordering"/>
+		</isee:extra_collection_variables>
+		<variables>
+			<group name="Generic" run="false">
+				<entity name="Orders_not_received"/>
+				<entity name="Ordering"/>
+				<entity name="Orders_being_filled"/>
+				<entity name="Receiving_product"/>
+				<entity name="Calculated_delivery_delay"/>
+				<entity name="Order_Pipeline_Gap"/>
+				<entity name="Correction_for_orders_in_pipeline"/>
+				<entity name="Required_orders_in_pipeline"/>
+				<entity name="Inventory"/>
+				<entity name="Shipping"/>
+				<entity name="Replacement_ordering"/>
+				<entity name="Inventory_Correction"/>
+			</group>
+			<group name="Generic Parameters" run="false">
+				<entity name="INIT_Orders_not_received"/>
+				<entity name="Time_to_correct_order_pipeline"/>
+				<entity name="Time_to_correct_inventory"/>
+				<entity name="Init_Inventory"/>
+				<entity name="AT_as_Inventory"/>
+				<entity name="Rate_of_Receiving_Product"/>
+				<entity name="Desired_Inventory"/>
+				<entity name="Awareness_of_Material_in_Pipeline"/>
+				<entity name="Forecasted_Demand"/>
+			</group>
+			<aux name="INIT Orders\nnot received">
+				<eqn>100</eqn>
+				<units>Cases</units>
+			</aux>
+			<aux name="Time to correct\norder pipeline">
+				<eqn>2</eqn>
+				<units>Quarters</units>
+			</aux>
+			<aux name="Time to correct\ninventory">
+				<eqn>4</eqn>
+				<units>Quarters</units>
+			</aux>
+			<aux name="Init Inventory">
+				<eqn>100</eqn>
+				<units>Cases</units>
+			</aux>
+			<aux name="AT as Inventory">
+				<eqn>1</eqn>
+				<units>Quarters</units>
+			</aux>
+			<aux name="Awareness of\nMaterial in Pipeline">
+				<eqn>.5</eqn>
+				<units>dmnl</units>
+			</aux>
+			<group name="Adapted: Students" run="false"/>
+			<group name="Generic Parameters 1" run="false"/>
+			<stock name="Orders not\nreceived">
+				<eqn>INIT_Orders_not_received</eqn>
+				<inflow>Ordering</inflow>
+				<outflow>Orders_being_filled</outflow>
+				<non_negative/>
+				<units>Cases</units>
+			</stock>
+			<flow name="Ordering">
+				<eqn>MAX(0, Correction_for_orders_in_pipeline+Inventory_Correction+Replacement_ordering)</eqn>
+				<non_negative/>
+				<units>Cases/quarter</units>
+			</flow>
+			<flow name="Orders being\nfilled">
+				<eqn>Receiving_product</eqn>
+				<non_negative/>
+				<units>Cases/quarter</units>
+			</flow>
+			<stock name="Inventory">
+				<eqn>Init_Inventory</eqn>
+				<inflow>Receiving_product</inflow>
+				<outflow>Shipping</outflow>
+				<non_negative/>
+				<units>Cases</units>
+			</stock>
+			<flow name="Receiving\nproduct">
+				<eqn>Rate_of_Receiving_Product</eqn>
+				<non_negative/>
+				<units>Cases/quarter</units>
+			</flow>
+			<flow name="Shipping">
+				<eqn>Inventory/AT_as_Inventory</eqn>
+				<non_negative/>
+				<units>Cases/quarter</units>
+			</flow>
+			<aux name="Inventory Correction">
+				<eqn>(Desired_Inventory-Inventory)/Time_to_correct_inventory</eqn>
+				<units>Cases/quarter</units>
+			</aux>
+			<aux name="Calculated\ndelivery delay">
+				<eqn>Orders_not_received/Orders_being_filled</eqn>
+				<units>Quarters</units>
+			</aux>
+			<aux name="Rate of Receiving\nProduct">
+				<eqn>15</eqn>
+				<units>Cases/quarter</units>
+			</aux>
+			<aux name="Order Pipeline\nGap">
+				<eqn>(Required_orders_in_pipeline-Orders_not_received)*Awareness_of_Material_in_Pipeline</eqn>
+				<units>Cases</units>
+			</aux>
+			<aux name="Correction for orders in pipeline">
+				<eqn>Order_Pipeline_Gap/Time_to_correct_order_pipeline</eqn>
+				<units>Cases/quarter</units>
+			</aux>
+			<aux name="Required orders\nin pipeline">
+				<eqn>Forecasted_Demand*Calculated_delivery_delay</eqn>
+				<units>Cases</units>
+			</aux>
+			<aux name="Forecasted Demand">
+				<eqn>10</eqn>
+				<units>Cases/quarter</units>
+			</aux>
+			<aux name="Replacement ordering">
+				<eqn>Shipping</eqn>
+				<units>Cases/quarter</units>
+			</aux>
+			<aux name="Desired Inventory">
+				<eqn>100</eqn>
+				<units>Cases</units>
+			</aux>
+		</variables>
+		<views>
+			<style color="black" background="white" font_style="normal" font_weight="normal" text_decoration="none" text_align="center" vertical_text_align="center" font_color="black" font_family="Arial" font_size="10pt" padding="2" border_color="black" border_width="thin" border_style="none">
+				<text_box color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+				<isee:loop_indicator color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+				<numeric_display color="blue" background="white" font_size="9pt" isee:transparent="false"/>
+				<graph color="black" background="white" font_size="12pt" axis_color="#666666" grid_color="#C8C8C8" isee:graph_area_color="white" legend_position="bottom" isee:transparent="false" isee:hide_border="false" axis_title_font_style="normal" axis_title_font_weight="normal" axis_title_text_decoration="none" axis_title_text_align="center" axis_title_vertical_text_align="center" axis_title_font_color="black" axis_title_font_family="Arial" axis_title_font_size="12pt" axis_title_text_padding="2" axis_title_text_border_color="black" axis_title_text_border_width="thin" axis_title_text_border_style="none" axis_label_font_style="normal" axis_label_font_weight="normal" axis_label_text_decoration="none" axis_label_text_align="center" axis_label_vertical_text_align="center" axis_label_font_color="black" axis_label_font_family="Arial" axis_label_font_size="9pt" axis_label_text_padding="2" axis_label_text_border_color="black" axis_label_text_border_width="thin" axis_label_text_border_style="none">
+					<isee:series_styles>
+						<isee:series_style color="blue" thickness="1"/>
+						<isee:series_style color="red" thickness="1" pen_style="dot_dashed"/>
+						<isee:series_style color="fuchsia" thickness="1" pen_style="dotted"/>
+						<isee:series_style color="#008F44" thickness="1" pen_style="dashed"/>
+						<isee:series_style color="#FF7F00" thickness="1"/>
+						<isee:series_style color="#7F00FF" thickness="1" pen_style="dot_dashed"/>
+						<isee:series_style color="#0CA0FF" thickness="1" pen_style="dotted"/>
+						<isee:series_style color="lime" thickness="1" pen_style="dashed"/>
+						<isee:series_style color="#FF007F" thickness="1"/>
+						<isee:series_style color="aqua" thickness="1" pen_style="dot_dashed"/>
+						<isee:series_style color="#F586FF" thickness="1" pen_style="dotted"/>
+						<isee:series_style color="black" thickness="1" pen_style="dashed"/>
+						<isee:series_style color="#C8C8C8" thickness="1"/>
+					</isee:series_styles>
+				</graph>
+				<table color="black" background="#E0E0E0" text_align="right" font_size="12pt" orientation="vertical" wrap_text="false" isee:auto_fit="true" isee:use_alternate_row_colors="false" isee:unlimited_table_length="false" blank_column_width="80" column_width="160" interval="1" report_balances="beginning" report_flows="instantaneous" header_font_style="normal" header_font_weight="normal" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="12pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
+				<button color="black" background="#E0E0E0" font_size="12pt" border_width="thin" border_style="solid" transparent="false" corner_radius="0" isee:flat="false" icon_side="top" isee:highlight_on_hover="false" isee:highlight_color="#959595"/>
+				<isee:annotation color="black" background="#E0E0E0" font_size="12pt" border_width="thin" border_style="solid" transparent="false" corner_radius="0" isee:flat="false" icon_side="top" isee:highlight_on_hover="false" isee:highlight_color="#959595" popup_corner_radius="0" popup_background_color="#FFFECF"/>
+				<slider color="black" background="#E0E0E0" font_size="12pt" num_ticks="3" label_side="top" wrap_title="true" vertical="false" isee:fancy_appearance="false" isee:show_hover_tip="when_deciding" input_expands="true" input_width="100"/>
+				<isee:sim_speed_slider color="black" background="white"/>
+				<isee:time_slider color="black" background="white"/>
+				<isee:pie_input color="black" background="white" font_size="12pt" legend_position="bottom" isee:transparent="false"/>
+				<knob color="#66CC66" background="#E0E0E0" font_size="12pt" label_side="bottom" wrap_title="true"/>
+				<numeric_input color="black" background="#E0E0E0" font_size="12pt" label_side="left" wrap_title="true" input_expands="false" input_width="100"/>
+				<switch color="black" background="#E0E0E0" font_size="12pt" label_side="top" wrap_title="true" isee:appearance="switch" isee:on_color="green"/>
+				<options color="black" background="white" appearance="radio-buttons" arrangement="vertical"/>
+				<graphical_input color="black" background="#E0E0E0" font_size="12pt" isee:show_hover_tip="true"/>
+				<group_input color="black" background="#E0E0E0" font_size="12pt"/>
+				<lamp color="black" background="white" font_size="9pt"/>
+				<gauge color="black" background="white" font_size="9pt" needle_color="#F09F72" bar_color="#EEEEEE" bar_progress_color="black" appearance="radial" num_major_ticks="11" num_minor_ticks="11" show_numeric_value="true"/>
+				<isee:spatial_map color="black" background="white" font_size="12pt"/>
+				<isee:animation_object color="black" background="white" font_size="12pt"/>
+				<isee:navigation_widget color="black" background="white" border_color="#999999" border_width="thin" border_style="solid" item_spacing="6" appearance="tabs" corner_radius="4" selected_item_color="black" selected_item_background="white" item_background="#DDDDDD"/>
+				<isee:shape color="black" background="white" opacity="1" transparent_background="true"/>
+				<isee:selector color="black" background="white"/>
+				<isee:iframe color="black" background="white"/>
+				<isee:financial_table color="black" background="white" auto_fit="true" first_column_width="250" other_column_width="100" header_font_style="normal" header_font_weight="bold" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="14pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
+			</style>
+			<view isee:show_pages="false" background="white" page_width="768" page_height="588" isee:page_cols="2" isee:page_rows="2" isee:scroll_x="5" isee:popup_graphs_are_comparative="true" isee:enable_non_negative_highlights="false" type="stock_flow">
+				<style color="black" background="white" font_style="normal" font_weight="normal" text_decoration="none" text_align="center" vertical_text_align="center" font_color="black" font_family="Arial" font_size="10pt" padding="2" border_color="black" border_width="thin" border_style="none">
+					<stock color="blue" background="white" font_color="blue" font_size="12pt" label_side="top">
+						<shape type="rectangle" width="45" height="35"/>
+					</stock>
+					<flow color="blue" background="white" font_color="blue" font_size="12pt" label_side="bottom"/>
+					<isee:placeholder color="#228B22" background="white" font_color="#228B22" label_side="bottom"/>
+					<module color="blue" background="white" font_color="blue" font_size="12pt" label_side="top">
+						<shape type="rectangle" width="55" height="45"/>
+					</module>
+					<aux color="blue" background="white" font_color="blue" font_size="12pt" label_side="bottom">
+						<shape type="circle" radius="18"/>
+					</aux>
+					<group color="red" background="white" font_color="red" font_size="9pt"/>
+					<connector color="#FF007F" background="white" font_color="#FF007F" font_size="9pt" isee:thickness="1"/>
+					<text_box color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+					<isee:loop_indicator color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+					<numeric_display color="blue" background="white" font_size="9pt" isee:transparent="false"/>
+					<graph color="black" background="white" font_size="12pt" axis_color="#666666" grid_color="#C8C8C8" isee:graph_area_color="white" legend_position="bottom" isee:transparent="false" isee:hide_border="false" axis_title_font_style="normal" axis_title_font_weight="normal" axis_title_text_decoration="none" axis_title_text_align="center" axis_title_vertical_text_align="center" axis_title_font_color="black" axis_title_font_family="Arial" axis_title_font_size="12pt" axis_title_text_padding="2" axis_title_text_border_color="black" axis_title_text_border_width="thin" axis_title_text_border_style="none" axis_label_font_style="normal" axis_label_font_weight="normal" axis_label_text_decoration="none" axis_label_text_align="center" axis_label_vertical_text_align="center" axis_label_font_color="black" axis_label_font_family="Arial" axis_label_font_size="9pt" axis_label_text_padding="2" axis_label_text_border_color="black" axis_label_text_border_width="thin" axis_label_text_border_style="none">
+						<isee:series_styles>
+							<isee:series_style color="blue" thickness="1"/>
+							<isee:series_style color="red" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="fuchsia" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="#008F44" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#FF7F00" thickness="1"/>
+							<isee:series_style color="#7F00FF" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="#0CA0FF" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="lime" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#FF007F" thickness="1"/>
+							<isee:series_style color="aqua" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="#F586FF" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="black" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#C8C8C8" thickness="1"/>
+						</isee:series_styles>
+					</graph>
+					<table color="black" background="#E0E0E0" text_align="right" font_size="12pt" orientation="vertical" wrap_text="false" isee:auto_fit="true" isee:use_alternate_row_colors="false" isee:unlimited_table_length="false" blank_column_width="80" column_width="160" interval="1" report_balances="beginning" report_flows="instantaneous" header_font_style="normal" header_font_weight="normal" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="12pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
+				</style>
+				<stacked_container uid="1" x="949" y="179">
+					<graph width="350" height="250" type="time_series" isee:points_only="false" show_grid="false" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="5" num_y_labels="3" isee:fill_intensity="0.1" left_axis_multi_scale="false" left_axis_auto_scale="true" left_include_units="true" right_axis_multi_scale="false" right_axis_auto_scale="true" right_include_units="true">
+						<plot color="blue" isee:keep_zero_visible="true" pen_width="1" index="0" show_y_axis="true">
+							<entity name="Inventory"/>
+						</plot>
+						<plot color="red" pen_style="dot_dashed" isee:keep_zero_visible="false" pen_width="1" index="1" show_y_axis="true">
+							<entity name="Orders_not_received"/>
+						</plot>
+					</graph>
+				</stacked_container>
+				<group locked="false" x="58" y="68" width="535" height="509" name="Generic">
+					<item uid="2"/>
+					<item uid="3"/>
+					<item uid="4"/>
+					<item uid="5"/>
+					<item uid="6"/>
+					<item uid="7"/>
+					<item uid="8"/>
+				</group>
+				<text_box uid="9" x="777" y="312" width="260" height="103">Source - Jim Hines. 2005. Molecules of Structure: Building Blocks for system dynamics models. 
+
+Note: Still not working - don&apos;t know how to think about initial conditions....</text_box>
+				<group locked="false" x="594" y="68" width="173" height="508" name="Generic Parameters"/>
+				<aux label_side="right" x="631" y="106" name="INIT Orders\nnot received"/>
+				<aux label_side="right" x="631" y="225" name="Time to correct\norder pipeline"/>
+				<aux label_side="right" x="631" y="268" name="Time to correct\ninventory"/>
+				<aux label_side="right" x="631" y="152" name="Init Inventory"/>
+				<aux label_side="right" x="631" y="314" name="AT as Inventory"/>
+				<aux label_side="right" x="631" y="402" name="Awareness of\nMaterial in Pipeline"/>
+				<group locked="false" x="58" y="605" width="535" height="384" name="Adapted: Students"/>
+				<group locked="false" x="594" y="605" width="173" height="384" name="Generic Parameters 1"/>
+				<stock label_side="center" x="164.5" y="131" width="75" height="51" name="Orders not\nreceived"/>
+				<flow label_side="top" x="132.25" y="156" name="Ordering">
+					<pts>
+						<pt x="100" y="156"/>
+						<pt x="164.5" y="156"/>
+					</pts>
+				</flow>
+				<flow label_side="top" x="273.75" y="156" name="Orders being\nfilled">
+					<pts>
+						<pt x="239.5" y="156"/>
+						<pt x="332" y="156"/>
+					</pts>
+				</flow>
+				<stock label_side="center" x="417.5" y="207" width="80" height="50" name="Inventory"/>
+				<flow x="378.75" y="230" name="Receiving\nproduct">
+					<pts>
+						<pt x="340" y="230"/>
+						<pt x="417.5" y="230"/>
+					</pts>
+				</flow>
+				<flow x="524.25" y="230" name="Shipping">
+					<pts>
+						<pt x="497.5" y="230"/>
+						<pt x="575" y="230"/>
+					</pts>
+				</flow>
+				<connector uid="10" angle="34.6027">
+					<from>Inventory</from>
+					<to>Shipping</to>
+				</connector>
+				<connector uid="11" angle="110.022">
+					<from>
+						<alias uid="4"/>
+					</from>
+					<to>Shipping</to>
+				</connector>
+				<aux label_side="top" x="277.25" y="494" name="Inventory Correction"/>
+				<connector uid="12" angle="180">
+					<from>Inventory_Correction</from>
+					<to>Ordering</to>
+				</connector>
+				<connector uid="13" angle="294.034">
+					<from>Inventory</from>
+					<to>Inventory_Correction</to>
+				</connector>
+				<connector uid="14" angle="39.8056">
+					<from>
+						<alias uid="6"/>
+					</from>
+					<to>Inventory_Correction</to>
+				</connector>
+				<connector uid="15" angle="112.463">
+					<from>Receiving_product</from>
+					<to>Orders_being_filled</to>
+				</connector>
+				<aux x="295.25" y="218" name="Calculated\ndelivery delay"/>
+				<connector uid="16" angle="339.316">
+					<from>Orders_not_received</from>
+					<to>Calculated_delivery_delay</to>
+				</connector>
+				<connector uid="17" angle="324.782">
+					<from>Orders_being_filled</from>
+					<to>Calculated_delivery_delay</to>
+				</connector>
+				<aux label_side="right" x="631" y="354" name="Rate of Receiving\nProduct"/>
+				<connector uid="18" angle="219.385">
+					<from>
+						<alias uid="5"/>
+					</from>
+					<to>Receiving_product</to>
+				</connector>
+				<aux x="210.25" y="300" name="Order Pipeline\nGap"/>
+				<connector uid="19" angle="301.39">
+					<from>Orders_not_received</from>
+					<to>Order_Pipeline_Gap</to>
+				</connector>
+				<aux x="124" y="266" name="Correction for orders in pipeline"/>
+				<connector uid="20" angle="186.17">
+					<from>Order_Pipeline_Gap</from>
+					<to>Correction_for_orders_in_pipeline</to>
+				</connector>
+				<connector uid="21" angle="120.964">
+					<from>Correction_for_orders_in_pipeline</from>
+					<to>Ordering</to>
+				</connector>
+				<connector uid="22" angle="92.9737">
+					<from>
+						<alias uid="2"/>
+					</from>
+					<to>Correction_for_orders_in_pipeline</to>
+				</connector>
+				<connector uid="23" angle="107.745">
+					<from>
+						<alias uid="7"/>
+					</from>
+					<to>Order_Pipeline_Gap</to>
+				</connector>
+				<aux x="290.25" y="282" name="Required orders\nin pipeline"/>
+				<aux label_side="right" x="631" y="460" name="Forecasted Demand"/>
+				<connector uid="24" angle="148.62">
+					<from>
+						<alias uid="3"/>
+					</from>
+					<to>Required_orders_in_pipeline</to>
+				</connector>
+				<connector uid="25" angle="302.291">
+					<from>Calculated_delivery_delay</from>
+					<to>Required_orders_in_pipeline</to>
+				</connector>
+				<connector uid="26" angle="217.972">
+					<from>Required_orders_in_pipeline</from>
+					<to>Order_Pipeline_Gap</to>
+				</connector>
+				<aux x="425.5" y="97" name="Replacement ordering"/>
+				<connector uid="27" angle="157.068">
+					<from>Replacement_ordering</from>
+					<to>Ordering</to>
+				</connector>
+				<connector uid="28" angle="99.1888">
+					<from>Shipping</from>
+					<to>Replacement_ordering</to>
+				</connector>
+				<stacked_container uid="29" x="949" y="557">
+					<graph width="350" height="250" type="time_series" isee:points_only="false" show_grid="false" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="5" num_y_labels="3" isee:fill_intensity="0.1" left_axis_multi_scale="false" left_axis_auto_scale="true" left_include_units="true" right_axis_multi_scale="false" right_axis_auto_scale="true" right_include_units="true">
+						<plot color="blue" isee:keep_zero_visible="true" pen_width="1" index="0" show_y_axis="true">
+							<entity name="Ordering"/>
+						</plot>
+						<plot color="red" pen_style="dot_dashed" isee:keep_zero_visible="true" pen_width="1" index="1" show_y_axis="true">
+							<entity name="Orders_being_filled"/>
+						</plot>
+						<plot color="fuchsia" pen_style="dotted" isee:keep_zero_visible="false" pen_width="1" index="2" show_y_axis="true">
+							<entity name="Shipping"/>
+						</plot>
+					</graph>
+				</stacked_container>
+				<aux label_side="right" x="631" y="188" name="Desired Inventory"/>
+				<connector uid="30" angle="132.436">
+					<from>
+						<alias uid="8"/>
+					</from>
+					<to>Inventory_Correction</to>
+				</connector>
+				<alias font_style="italic" uid="4" x="536.75" y="280" width="18" height="18">
+					<of>AT_as_Inventory</of>
+				</alias>
+				<alias font_style="italic" uid="6" x="232.25" y="515" width="18" height="18">
+					<of>Time_to_correct_inventory</of>
+				</alias>
+				<alias font_style="italic" label_side="top" uid="5" x="427" y="174" width="18" height="18">
+					<of>Rate_of_Receiving_Product</of>
+				</alias>
+				<alias font_style="italic" uid="2" x="119" y="334" width="18" height="18">
+					<of>Time_to_correct_order_pipeline</of>
+				</alias>
+				<alias font_style="italic" uid="7" x="225.25" y="366" width="18" height="18">
+					<of>Awareness_of_Material_in_Pipeline</of>
+				</alias>
+				<alias font_style="italic" uid="3" x="351.75" y="316" width="18" height="18">
+					<of>Forecasted_Demand</of>
+				</alias>
+				<alias font_style="italic" uid="8" x="320" y="530" width="18" height="18">
+					<of>Desired_Inventory</of>
+				</alias>
+			</view>
+		</views>
+	</model>
+	<isee:controls>
+		<isee:control priority="interactive" name="Desired_Inventory" value="138.860859014941"/>
+		<isee:control priority="interactive" name="INIT_Orders_not_received" value="21.4432594263092"/>
+		<isee:control priority="interactive" name="Init_Inventory" value="28.2315649997057"/>
+		<isee:control priority="interactive" name="Rate_of_Receiving_Product" value="12.2484370406074"/>
+	</isee:controls>
+</xmile>
+

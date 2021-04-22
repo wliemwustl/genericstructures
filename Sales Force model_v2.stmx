@@ -1,0 +1,406 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xmile version="1.0" xmlns="http://docs.oasis-open.org/xmile/ns/XMILE/v1.0" xmlns:isee="http://iseesystems.com/XMILE">
+	<header>
+		<smile version="1.0" namespace="std, isee"/>
+		<name>Sales Force model_v2</name>
+		<uuid>fcb87c5f-01e2-4aa1-95db-f3591ce95312</uuid>
+		<vendor>isee systems, inc.</vendor>
+		<product version="2.0.1" isee:build_number="2228" isee:saved_by_v1="true" lang="en">Stella Architect</product>
+	</header>
+	<sim_specs isee:sim_duration="1.5" isee:simulation_delay="0.166667" isee:restore_on_start="false" method="Euler" time_units="years" isee:instantaneous_flows="false" isee:loop_scores="true" isee:loop_exhaustive_allowed="1000">
+		<start>1</start>
+		<stop>10</stop>
+		<dt reciprocal="true">12</dt>
+	</sim_specs>
+	<isee:prefs show_module_prefix="true" live_update_on_drag="true" show_restore_buttons="false" layer="model" interface_scale_ui="true" interface_max_page_width="10000" interface_max_page_height="10000" interface_min_page_width="0" interface_min_page_height="0" rerun_on_structure_change="false" saved_runs="5" keep="false" rifp="true"/>
+	<isee:multiplayer_settings include_chat="true" allow_observers="false" advance_time_increment="1" observer_start_page="home_page" enabled="false"/>
+	<isee:time_formats default_format="Builtin">
+		<isee:time_format name="Builtin" type="adaptive"/>
+	</isee:time_formats>
+	<default_format/>
+	<model_units>
+		<unit name="People">
+			<eqn/>
+			<alias>person</alias>
+			<alias>persons</alias>
+		</unit>
+		<unit name="Dimensionless">
+			<eqn>1</eqn>
+			<alias>dmnl</alias>
+			<alias>unitless</alias>
+			<alias>fraction</alias>
+		</unit>
+		<unit name="Widgets">
+			<eqn/>
+			<alias>widget</alias>
+		</unit>
+		<unit name="US Dollars">
+			<eqn/>
+			<alias>USD</alias>
+			<alias>$</alias>
+		</unit>
+		<unit name="Years">
+			<eqn/>
+			<alias>yr</alias>
+			<alias>year</alias>
+		</unit>
+	</model_units>
+	<model>
+		<variables>
+			<stock name="Sales people">
+				<eqn>INIT_sales_people</eqn>
+				<inflow>Change_in_team</inflow>
+				<outflow>Turnover</outflow>
+				<non_negative/>
+				<units>people</units>
+			</stock>
+			<flow name="Change in team">
+				<eqn>People_Gap/TIme_to_hire</eqn>
+				<units>people/years</units>
+			</flow>
+			<aux name="Widget sales">
+				<eqn>Sales_people*Size_of_market*Nomral_productivity</eqn>
+				<units>Widgets/years</units>
+			</aux>
+			<aux name="Size of market">
+				<eqn>Potential/(Potential+Customers)</eqn>
+				<units>dmnl</units>
+			</aux>
+			<aux name="Annual revenue">
+				<eqn>Widget_sales*Widget_price</eqn>
+				<units>$/years</units>
+			</aux>
+			<aux name="Widget price">
+				<eqn>50</eqn>
+				<units>$/widgets</units>
+			</aux>
+			<aux name="Sales dept budget">
+				<eqn>SMTH1(Annual_revenue*Fraction_to_sales, 1)</eqn>
+				<units>$/years</units>
+			</aux>
+			<aux name="Fraction to sales">
+				<eqn>.25</eqn>
+				<units>dmnl</units>
+			</aux>
+			<aux name="Budgeted number of sales persons">
+				<eqn>Sales_dept_budget/Sales_salary</eqn>
+				<units>people</units>
+			</aux>
+			<aux name="INIT sales people">
+				<eqn>10</eqn>
+				<units>people</units>
+			</aux>
+			<aux name="TIme to hire">
+				<eqn>1</eqn>
+				<units>years</units>
+			</aux>
+			<aux name="Sales salary">
+				<eqn>50000</eqn>
+				<units>$/years/people</units>
+			</aux>
+			<aux name="People Gap">
+				<eqn>Budgeted_number_of_sales_persons-Sales_people</eqn>
+				<units>people</units>
+			</aux>
+			<stock name="Potential">
+				<eqn>1000000</eqn>
+				<inflow>Adding_potential_customers</inflow>
+				<outflow>Purchasing</outflow>
+				<units>people</units>
+			</stock>
+			<stock name="Customers">
+				<eqn>10</eqn>
+				<inflow>Purchasing</inflow>
+				<units>people</units>
+			</stock>
+			<flow name="Purchasing">
+				<eqn>Widget_sales*&quot;Widegets/people&quot;</eqn>
+				<non_negative/>
+				<units>people/years</units>
+			</flow>
+			<aux name="Widegets/people">
+				<eqn>1</eqn>
+				<units>people/widgets</units>
+			</aux>
+			<aux name="Nomral productivity">
+				<eqn>10000</eqn>
+				<units>widgets/people/years</units>
+			</aux>
+			<aux name="Actual productivity">
+				<eqn>Widget_sales/Sales_people</eqn>
+				<units>widgets/people/years</units>
+			</aux>
+			<flow name="Turnover">
+				<eqn>Sales_people/Normal_turnover*Productivity_Ratio</eqn>
+				<non_negative/>
+				<units>people/years</units>
+			</flow>
+			<aux name="Normal turnover">
+				<eqn>3</eqn>
+				<units>years</units>
+			</aux>
+			<aux name="Productivity Ratio">
+				<eqn>Actual_productivity/Nomral_productivity</eqn>
+				<units>dmnl</units>
+			</aux>
+			<flow name="Adding potential customers">
+				<eqn>Rate_of_adding</eqn>
+				<non_negative/>
+				<units>people/years</units>
+			</flow>
+			<aux name="Rate of adding">
+				<eqn>50000</eqn>
+				<units>people/years</units>
+			</aux>
+		</variables>
+		<views>
+			<style color="black" background="white" font_style="normal" font_weight="normal" text_decoration="none" text_align="center" vertical_text_align="center" font_color="black" font_family="Arial" font_size="10pt" padding="2" border_color="black" border_width="thin" border_style="none">
+				<text_box color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+				<isee:loop_indicator color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+				<numeric_display color="blue" background="white" font_size="9pt" isee:transparent="false"/>
+				<graph color="black" background="white" font_size="12pt" axis_color="#666666" grid_color="#C8C8C8" isee:graph_area_color="white" legend_position="bottom" isee:transparent="false" isee:hide_border="false" axis_title_font_style="normal" axis_title_font_weight="normal" axis_title_text_decoration="none" axis_title_text_align="center" axis_title_vertical_text_align="center" axis_title_font_color="black" axis_title_font_family="Arial" axis_title_font_size="12pt" axis_title_text_padding="2" axis_title_text_border_color="black" axis_title_text_border_width="thin" axis_title_text_border_style="none" axis_label_font_style="normal" axis_label_font_weight="normal" axis_label_text_decoration="none" axis_label_text_align="center" axis_label_vertical_text_align="center" axis_label_font_color="black" axis_label_font_family="Arial" axis_label_font_size="9pt" axis_label_text_padding="2" axis_label_text_border_color="black" axis_label_text_border_width="thin" axis_label_text_border_style="none">
+					<isee:series_styles>
+						<isee:series_style color="blue" thickness="1"/>
+						<isee:series_style color="red" thickness="1" pen_style="dot_dashed"/>
+						<isee:series_style color="fuchsia" thickness="1" pen_style="dotted"/>
+						<isee:series_style color="#008F44" thickness="1" pen_style="dashed"/>
+						<isee:series_style color="#FF7F00" thickness="1"/>
+						<isee:series_style color="#7F00FF" thickness="1" pen_style="dot_dashed"/>
+						<isee:series_style color="#0CA0FF" thickness="1" pen_style="dotted"/>
+						<isee:series_style color="lime" thickness="1" pen_style="dashed"/>
+						<isee:series_style color="#FF007F" thickness="1"/>
+						<isee:series_style color="aqua" thickness="1" pen_style="dot_dashed"/>
+						<isee:series_style color="#F586FF" thickness="1" pen_style="dotted"/>
+						<isee:series_style color="black" thickness="1" pen_style="dashed"/>
+						<isee:series_style color="#C8C8C8" thickness="1"/>
+					</isee:series_styles>
+				</graph>
+				<table color="black" background="#E0E0E0" text_align="right" font_size="12pt" orientation="vertical" wrap_text="false" isee:auto_fit="true" isee:use_alternate_row_colors="false" isee:unlimited_table_length="false" blank_column_width="80" column_width="160" interval="1" report_balances="ending" report_flows="summed" header_font_style="normal" header_font_weight="normal" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="12pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
+				<button color="black" background="#E0E0E0" font_size="12pt" border_width="thin" border_style="solid" transparent="false" corner_radius="0" isee:flat="false" icon_side="top" isee:highlight_on_hover="false" isee:highlight_color="#959595"/>
+				<isee:annotation color="black" background="#E0E0E0" font_size="12pt" border_width="thin" border_style="solid" transparent="false" corner_radius="0" isee:flat="false" icon_side="top" isee:highlight_on_hover="false" isee:highlight_color="#959595" popup_corner_radius="0" popup_background_color="#FFFECF"/>
+				<slider color="#66CC66" background="#E0E0E0" font_size="12pt" num_ticks="3" label_side="top" wrap_title="true" vertical="false" isee:fancy_appearance="false" isee:show_hover_tip="when_deciding" input_expands="true" input_width="100"/>
+				<isee:sim_speed_slider color="black" background="white"/>
+				<isee:time_slider color="#E95F74" background="silver"/>
+				<isee:pie_input color="black" background="white" font_size="12pt" legend_position="bottom" isee:transparent="false"/>
+				<knob color="#66CC66" background="#E0E0E0" font_size="12pt" label_side="bottom" wrap_title="true"/>
+				<numeric_input color="black" background="#E0E0E0" font_size="12pt" label_side="left" wrap_title="true" input_expands="false" input_width="100"/>
+				<switch color="black" background="#E0E0E0" font_size="12pt" label_side="top" wrap_title="true" isee:appearance="switch" isee:on_color="green"/>
+				<options color="black" background="white" appearance="radio-buttons" arrangement="vertical"/>
+				<graphical_input color="black" background="#E0E0E0" font_size="12pt" isee:show_hover_tip="true"/>
+				<group_input color="black" background="#E0E0E0" font_size="12pt"/>
+				<lamp color="black" background="white" font_size="9pt"/>
+				<gauge color="black" background="white" font_size="9pt" needle_color="#F09F72" bar_color="#EEEEEE" bar_progress_color="black" appearance="radial" num_major_ticks="11" num_minor_ticks="11" show_numeric_value="true"/>
+				<isee:spatial_map color="black" background="white" font_size="12pt"/>
+				<isee:animation_object color="black" background="white" font_size="12pt"/>
+				<isee:navigation_widget color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt" border_color="#999999" border_width="thin" border_style="solid" item_spacing="6" appearance="tabs" corner_radius="4" selected_item_color="black" selected_item_background="white" item_background="#DDDDDD"/>
+				<isee:shape color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt" border_width="thin" border_style="solid" opacity="1" transparent_background="true"/>
+				<isee:selector color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+				<isee:iframe color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt" border_width="thin" border_style="solid"/>
+				<isee:financial_table color="black" background="#E0E0E0" text_align="right" font_size="12pt" auto_fit="true" first_column_width="250" other_column_width="100" header_font_style="normal" header_font_weight="bold" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="14pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
+			</style>
+			<view isee:show_pages="false" background="white" page_width="768" page_height="588" isee:page_cols="2" isee:page_rows="2" isee:scroll_y="7" isee:popup_graphs_are_comparative="true" isee:enable_non_negative_highlights="false" type="stock_flow">
+				<style color="black" background="white" font_style="normal" font_weight="normal" text_decoration="none" text_align="center" vertical_text_align="center" font_color="black" font_family="Arial" font_size="10pt" padding="2" border_color="black" border_width="thin" border_style="none">
+					<stock color="blue" background="white" font_color="blue" font_family="Avenir Next" font_size="9pt" label_side="top">
+						<shape type="rectangle" width="45" height="35"/>
+					</stock>
+					<flow color="blue" background="white" font_color="blue" font_family="Avenir Next" font_size="9pt" label_side="bottom"/>
+					<isee:placeholder color="#228B22" background="white" font_color="#228B22" font_family="Avenir Next" font_size="9pt" label_side="bottom"/>
+					<module color="blue" background="white" font_color="blue" font_family="Avenir Next" font_size="9pt" label_side="top">
+						<shape type="rectangle" width="55" height="45"/>
+					</module>
+					<aux color="blue" background="white" font_color="blue" font_family="Avenir Next" font_size="9pt" label_side="bottom">
+						<shape type="circle" radius="18"/>
+					</aux>
+					<group color="red" background="white" font_color="red" font_family="Avenir Next" font_size="9pt"/>
+					<connector color="#FF007F" background="white" font_color="#FF007F" font_size="9pt" isee:thickness="1"/>
+					<text_box color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+					<isee:loop_indicator color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+					<numeric_display color="blue" background="white" font_size="9pt" isee:transparent="false"/>
+					<graph color="black" background="white" font_size="12pt" axis_color="#666666" grid_color="#C8C8C8" isee:graph_area_color="white" legend_position="bottom" isee:transparent="false" isee:hide_border="false" axis_title_font_style="normal" axis_title_font_weight="normal" axis_title_text_decoration="none" axis_title_text_align="center" axis_title_vertical_text_align="center" axis_title_font_color="black" axis_title_font_family="Arial" axis_title_font_size="12pt" axis_title_text_padding="2" axis_title_text_border_color="black" axis_title_text_border_width="thin" axis_title_text_border_style="none" axis_label_font_style="normal" axis_label_font_weight="normal" axis_label_text_decoration="none" axis_label_text_align="center" axis_label_vertical_text_align="center" axis_label_font_color="black" axis_label_font_family="Arial" axis_label_font_size="9pt" axis_label_text_padding="2" axis_label_text_border_color="black" axis_label_text_border_width="thin" axis_label_text_border_style="none">
+						<isee:series_styles>
+							<isee:series_style color="blue" thickness="1"/>
+							<isee:series_style color="red" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="fuchsia" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="#008F44" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#FF7F00" thickness="1"/>
+							<isee:series_style color="#7F00FF" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="#0CA0FF" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="lime" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#FF007F" thickness="1"/>
+							<isee:series_style color="aqua" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="#F586FF" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="black" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#C8C8C8" thickness="1"/>
+						</isee:series_styles>
+					</graph>
+					<table color="black" background="#E0E0E0" text_align="right" font_size="12pt" orientation="vertical" wrap_text="false" isee:auto_fit="true" isee:use_alternate_row_colors="false" isee:unlimited_table_length="false" blank_column_width="80" column_width="160" interval="1" report_balances="ending" report_flows="summed" header_font_style="normal" header_font_weight="normal" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="12pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
+				</style>
+				<stock x="257" y="372" name="Sales people"/>
+				<flow x="192.75" y="372" name="Change in team">
+					<pts>
+						<pt x="139" y="372"/>
+						<pt x="234.5" y="372"/>
+					</pts>
+				</flow>
+				<aux x="279.25" y="275" name="Widget sales"/>
+				<aux x="267.5" y="151" name="Size of market"/>
+				<connector uid="1" angle="304.624">
+					<from>Size_of_market</from>
+					<to>Widget_sales</to>
+				</connector>
+				<connector uid="2" angle="109.44">
+					<from>Sales_people</from>
+					<to>Widget_sales</to>
+				</connector>
+				<aux x="401" y="251" name="Annual revenue"/>
+				<aux x="356.25" y="197" name="Widget price"/>
+				<aux label_side="bottom" x="499" y="361" name="Sales dept budget"/>
+				<aux x="542" y="301" name="Fraction to sales"/>
+				<connector uid="3" angle="278.13">
+					<from>Fraction_to_sales</from>
+					<to>Sales_dept_budget</to>
+				</connector>
+				<connector uid="4" angle="348.69">
+					<from>Annual_revenue</from>
+					<to>Sales_dept_budget</to>
+				</connector>
+				<connector uid="5" angle="0">
+					<from>Widget_price</from>
+					<to>Annual_revenue</to>
+				</connector>
+				<connector uid="6" angle="42.93">
+					<from>Widget_sales</from>
+					<to>Annual_revenue</to>
+				</connector>
+				<aux x="439" y="500" name="Budgeted number of sales persons"/>
+				<connector uid="7" angle="233.973">
+					<from>Budgeted_number_of_sales_persons</from>
+					<to>People_Gap</to>
+				</connector>
+				<connector uid="8" angle="276.71">
+					<from>Sales_dept_budget</from>
+					<to>Budgeted_number_of_sales_persons</to>
+				</connector>
+				<aux x="531" y="113" name="INIT sales people"/>
+				<aux x="112.5" y="436" name="TIme to hire"/>
+				<connector uid="9" angle="38.5726">
+					<from>TIme_to_hire</from>
+					<to>Change_in_team</to>
+				</connector>
+				<aux x="499" y="474" name="Sales salary"/>
+				<connector uid="10" angle="203.429">
+					<from>Sales_salary</from>
+					<to>Budgeted_number_of_sales_persons</to>
+				</connector>
+				<connector uid="11" angle="291.801">
+					<from>Sales_people</from>
+					<to>People_Gap</to>
+				</connector>
+				<aux x="225.5" y="518" name="People Gap"/>
+				<connector uid="12" angle="147.171">
+					<from>People_Gap</from>
+					<to>Change_in_team</to>
+				</connector>
+				<stacked_container uid="13" x="821" y="187.5">
+					<graph width="350" height="250" type="time_series" isee:points_only="false" show_grid="false" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="5" num_y_labels="3" isee:fill_intensity="0.1" isee:allow_zero_axis="true" left_axis_multi_scale="false" left_axis_auto_scale="true" left_include_units="true" right_axis_multi_scale="false" right_axis_auto_scale="true" right_include_units="true">
+						<plot color="blue" isee:keep_zero_visible="true" pen_width="1" index="0" show_y_axis="true">
+							<entity name="Sales_people"/>
+						</plot>
+						<plot color="red" pen_style="dot_dashed" isee:keep_zero_visible="true" pen_width="1" index="0" right_axis="true" show_y_axis="true">
+							<entity name="Actual_productivity"/>
+						</plot>
+					</graph>
+				</stacked_container>
+				<stock x="177" y="109" name="Potential"/>
+				<stock x="179" y="214.5" name="Customers"/>
+				<flow x="178" y="155.75" name="Purchasing">
+					<pts>
+						<pt x="178" y="126.5"/>
+						<pt x="178" y="197"/>
+					</pts>
+				</flow>
+				<connector uid="14" angle="215.02">
+					<from>Widget_sales</from>
+					<to>Purchasing</to>
+				</connector>
+				<connector uid="15" angle="335.105">
+					<from>Potential</from>
+					<to>Size_of_market</to>
+				</connector>
+				<connector uid="16" angle="83.6598">
+					<from>Customers</from>
+					<to>Size_of_market</to>
+				</connector>
+				<aux x="92.5" y="151" name="Widegets/people"/>
+				<connector uid="17" angle="356.82">
+					<from>&quot;Widegets/people&quot;</from>
+					<to>Purchasing</to>
+				</connector>
+				<aux x="389.5" y="293" name="Nomral productivity"/>
+				<connector uid="18" angle="170.727">
+					<from>Nomral_productivity</from>
+					<to>Widget_sales</to>
+				</connector>
+				<aux x="308.25" y="311" name="Actual productivity"/>
+				<connector uid="19" angle="0">
+					<from>Widget_sales</from>
+					<to>Actual_productivity</to>
+				</connector>
+				<connector uid="20" angle="84.2894">
+					<from>Sales_people</from>
+					<to>Actual_productivity</to>
+				</connector>
+				<flow x="317.25" y="372" name="Turnover">
+					<pts>
+						<pt x="279.5" y="372"/>
+						<pt x="379" y="372"/>
+					</pts>
+				</flow>
+				<aux x="317.25" y="436" name="Normal turnover"/>
+				<connector uid="21" angle="90">
+					<from>Normal_turnover</from>
+					<to>Turnover</to>
+				</connector>
+				<connector uid="22" angle="337.797">
+					<from>Sales_people</from>
+					<to>Turnover</to>
+				</connector>
+				<connector uid="23" angle="339.59">
+					<from>Actual_productivity</from>
+					<to>Productivity_Ratio</to>
+				</connector>
+				<aux x="356.25" y="326" name="Productivity Ratio"/>
+				<connector uid="24" angle="259.875">
+					<from>Productivity_Ratio</from>
+					<to>Turnover</to>
+				</connector>
+				<connector uid="25" angle="296.565">
+					<from>Nomral_productivity</from>
+					<to>Productivity_Ratio</to>
+				</connector>
+				<flow x="177" y="57.25" name="Adding potential customers">
+					<pts>
+						<pt x="177" y="23"/>
+						<pt x="177" y="91.5"/>
+					</pts>
+				</flow>
+				<aux x="85" y="49" name="Rate of adding"/>
+				<connector uid="26" angle="10.9541">
+					<from>Rate_of_adding</from>
+					<to>Adding_potential_customers</to>
+				</connector>
+				<stacked_container uid="27" x="817" y="451">
+					<graph width="350" height="250" comparative="true" type="time_series" isee:points_only="false" show_grid="false" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="5" num_y_labels="3" isee:fill_intensity="0.1" isee:allow_zero_axis="true" left_axis_multi_scale="false" left_axis_auto_scale="true" left_include_units="true" right_axis_multi_scale="false" right_axis_auto_scale="true" right_include_units="true">
+						<plot color="blue" isee:keep_zero_visible="true" pen_width="1" index="0" show_y_axis="true">
+							<entity name="Customers"/>
+						</plot>
+					</graph>
+				</stacked_container>
+			</view>
+		</views>
+	</model>
+	<isee:controls>
+		<isee:control priority="interactive" name="Fraction_to_sales" value="0.795984701094985"/>
+	</isee:controls>
+</xmile>
+

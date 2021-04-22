@@ -1,0 +1,383 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xmile version="1.0" xmlns="http://docs.oasis-open.org/xmile/ns/XMILE/v1.0" xmlns:isee="http://iseesystems.com/XMILE">
+	<header>
+		<smile version="1.0" namespace="std, isee"/>
+		<name>Foster Care Placements_v2</name>
+		<uuid>3ab56f1a-e5ae-4037-b461-e4176f6a89ea</uuid>
+		<vendor>isee systems, inc.</vendor>
+		<product version="2.0.1" isee:build_number="2228" isee:saved_by_v1="true" lang="en">Stella Architect</product>
+	</header>
+	<sim_specs isee:sim_duration="1.425" isee:simulation_delay="0.075" isee:restore_on_start="false" method="Euler" time_units="Years" isee:instantaneous_flows="true" isee:loop_scores="true" isee:loop_exhaustive_allowed="1000">
+		<start>1</start>
+		<stop>20</stop>
+		<dt reciprocal="true">25</dt>
+	</sim_specs>
+	<isee:prefs show_module_prefix="true" live_update_on_drag="true" show_restore_buttons="false" layer="model" interface_scale_ui="true" interface_max_page_width="10000" interface_max_page_height="10000" interface_min_page_width="0" interface_min_page_height="0" rerun_on_structure_change="false" saved_runs="5" keep="false" rifp="true"/>
+	<isee:multiplayer_settings include_chat="true" allow_observers="false" advance_time_increment="1" observer_start_page="home_page" enabled="false"/>
+	<isee:time_formats default_format="Builtin">
+		<isee:time_format name="Builtin" type="adaptive"/>
+	</isee:time_formats>
+	<default_format/>
+	<model_units>
+		<unit name="Years">
+			<eqn/>
+			<alias>yr</alias>
+			<alias>year</alias>
+		</unit>
+		<unit name="Dimensionless">
+			<eqn>1</eqn>
+			<alias>dmnl</alias>
+			<alias>unitless</alias>
+		</unit>
+	</model_units>
+	<model>
+		<isee:extra_collection_variables>
+			<isee:extra_collection_variable name="Foster_Placements"/>
+			<isee:extra_collection_variable name="Children_in_Foster_Placements"/>
+			<isee:extra_collection_variable name="Children_not_in_placement"/>
+		</isee:extra_collection_variables>
+		<variables>
+			<stock name="Children in\nFoster\nPlacements">
+				<eqn>INIT_Children_in_foster_placements</eqn>
+				<inflow>Entering_Placement</inflow>
+				<outflow>Leaving_Placements</outflow>
+				<outflow>Permentant_placements</outflow>
+				<non_negative/>
+				<units>Children</units>
+			</stock>
+			<flow name="Entering\nPlacement">
+				<eqn>MAX(0, Children_not_in_placement/&quot;Min_time_for_|placement&quot;*Remaining_capacity)</eqn>
+				<non_negative/>
+				<units>Children/year</units>
+			</flow>
+			<stock name="Children not\nin placement">
+				<eqn>INIT_Chidlren_not_in_placement</eqn>
+				<inflow>Leaving_Placements</inflow>
+				<inflow>New_children_entering_foster_care_system</inflow>
+				<outflow>Entering_Placement</outflow>
+				<non_negative/>
+				<units>Children</units>
+			</stock>
+			<stock name="Foster\nPlacements">
+				<eqn>INIT_placements</eqn>
+				<inflow>Adding_foster_placements</inflow>
+				<outflow>Placements_leaving</outflow>
+				<non_negative/>
+				<units>homes</units>
+			</stock>
+			<aux name="Homes per children">
+				<eqn>1</eqn>
+				<units>homes/children</units>
+			</aux>
+			<flow name="Adding foster\nplacements">
+				<eqn>Placement_gaps/Min_time_to_add_placement</eqn>
+				<non_negative/>
+				<units>homes/Years</units>
+			</flow>
+			<flow name="Placements\nleaving">
+				<eqn>DELAY3(Adding_foster_placements, Time_as_placement)</eqn>
+				<non_negative/>
+				<units>homes/Years</units>
+			</flow>
+			<aux name="FR leaving">
+				<eqn>.25</eqn>
+				<units>Years</units>
+			</aux>
+			<aux name="INIT Children in foster placements">
+				<eqn>200</eqn>
+				<units>children</units>
+			</aux>
+			<aux name="INIT Chidlren\nnot in placement">
+				<eqn>200</eqn>
+				<units>children</units>
+			</aux>
+			<aux name="Time as placement">
+				<eqn>5</eqn>
+				<units>Years</units>
+			</aux>
+			<aux name="Remaining capacity">
+				<eqn>Children_in_Foster_Placements/Foster_Placements*Homes_per_children</eqn>
+				<units>dmnl</units>
+			</aux>
+			<aux name="INIT placements">
+				<eqn>200</eqn>
+				<units>homes</units>
+			</aux>
+			<aux name="Min time for |placement">
+				<eqn>.75</eqn>
+				<units>Years</units>
+			</aux>
+			<flow name="Leaving Placements">
+				<eqn>Children_in_Foster_Placements*FR_leaving</eqn>
+				<non_negative/>
+				<units>Children/year</units>
+			</flow>
+			<aux name="Min time to\nadd placement">
+				<eqn>5</eqn>
+				<units>Years</units>
+			</aux>
+			<flow name="Permentant placements">
+				<eqn>Children_in_Foster_Placements/AT_permanent_placement</eqn>
+				<non_negative/>
+				<units>Children/year</units>
+			</flow>
+			<aux name="Indicated Homes">
+				<eqn>(Children_not_in_placement+Children_in_Foster_Placements)*Homes_per_children</eqn>
+				<units>homes</units>
+			</aux>
+			<aux name="AT permanent placement">
+				<eqn>2</eqn>
+				<units>years</units>
+			</aux>
+			<flow name="New children\nentering foster\ncare system">
+				<eqn>Rate_of_new_children_entering</eqn>
+				<non_negative/>
+				<units>Children/year</units>
+			</flow>
+			<aux name="Rate of new children entering">
+				<eqn>1000</eqn>
+				<units>children/years</units>
+			</aux>
+			<aux name="Placement gaps">
+				<eqn>Indicated_Homes-Foster_Placements</eqn>
+				<units>homes</units>
+			</aux>
+		</variables>
+		<views>
+			<style color="black" background="white" font_style="normal" font_weight="normal" text_decoration="none" text_align="center" vertical_text_align="center" font_color="black" font_family="Arial" font_size="10pt" padding="2" border_color="black" border_width="thin" border_style="none">
+				<text_box color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+				<isee:loop_indicator color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+				<numeric_display color="blue" background="white" font_size="9pt" isee:transparent="false"/>
+				<graph color="black" background="white" font_size="12pt" axis_color="#666666" grid_color="#C8C8C8" isee:graph_area_color="white" legend_position="bottom" isee:transparent="false" isee:hide_border="false" axis_title_font_style="normal" axis_title_font_weight="normal" axis_title_text_decoration="none" axis_title_text_align="center" axis_title_vertical_text_align="center" axis_title_font_color="black" axis_title_font_family="Arial" axis_title_font_size="12pt" axis_title_text_padding="2" axis_title_text_border_color="black" axis_title_text_border_width="thin" axis_title_text_border_style="none" axis_label_font_style="normal" axis_label_font_weight="normal" axis_label_text_decoration="none" axis_label_text_align="center" axis_label_vertical_text_align="center" axis_label_font_color="black" axis_label_font_family="Arial" axis_label_font_size="9pt" axis_label_text_padding="2" axis_label_text_border_color="black" axis_label_text_border_width="thin" axis_label_text_border_style="none">
+					<isee:series_styles>
+						<isee:series_style color="blue" thickness="1"/>
+						<isee:series_style color="red" thickness="1" pen_style="dot_dashed"/>
+						<isee:series_style color="fuchsia" thickness="1" pen_style="dotted"/>
+						<isee:series_style color="#008F44" thickness="1" pen_style="dashed"/>
+						<isee:series_style color="#FF7F00" thickness="1"/>
+						<isee:series_style color="#7F00FF" thickness="1" pen_style="dot_dashed"/>
+						<isee:series_style color="#0CA0FF" thickness="1" pen_style="dotted"/>
+						<isee:series_style color="lime" thickness="1" pen_style="dashed"/>
+						<isee:series_style color="#FF007F" thickness="1"/>
+						<isee:series_style color="aqua" thickness="1" pen_style="dot_dashed"/>
+						<isee:series_style color="#F586FF" thickness="1" pen_style="dotted"/>
+						<isee:series_style color="black" thickness="1" pen_style="dashed"/>
+						<isee:series_style color="#C8C8C8" thickness="1"/>
+					</isee:series_styles>
+				</graph>
+				<table color="black" background="#E0E0E0" text_align="right" font_size="12pt" orientation="vertical" wrap_text="false" isee:auto_fit="true" isee:use_alternate_row_colors="false" isee:unlimited_table_length="false" blank_column_width="80" column_width="160" interval="1" report_balances="beginning" report_flows="instantaneous" header_font_style="normal" header_font_weight="normal" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="12pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
+				<button color="black" background="#E0E0E0" font_size="12pt" border_width="thin" border_style="solid" transparent="false" corner_radius="0" isee:flat="false" icon_side="top" isee:highlight_on_hover="false" isee:highlight_color="#959595"/>
+				<isee:annotation color="black" background="#E0E0E0" font_size="12pt" border_width="thin" border_style="solid" transparent="false" corner_radius="0" isee:flat="false" icon_side="top" isee:highlight_on_hover="false" isee:highlight_color="#959595" popup_corner_radius="0" popup_background_color="#FFFECF"/>
+				<slider color="black" background="#E0E0E0" font_size="12pt" num_ticks="3" label_side="top" wrap_title="true" vertical="false" isee:fancy_appearance="false" isee:show_hover_tip="when_deciding" input_expands="true" input_width="100"/>
+				<isee:sim_speed_slider color="black" background="white"/>
+				<isee:time_slider color="black" background="white"/>
+				<isee:pie_input color="black" background="white" font_size="12pt" legend_position="bottom" isee:transparent="false"/>
+				<knob color="#66CC66" background="#E0E0E0" font_size="12pt" label_side="bottom" wrap_title="true"/>
+				<numeric_input color="black" background="#E0E0E0" font_size="12pt" label_side="left" wrap_title="true" input_expands="false" input_width="100"/>
+				<switch color="black" background="#E0E0E0" font_size="12pt" label_side="top" wrap_title="true" isee:appearance="switch" isee:on_color="green"/>
+				<options color="black" background="white" appearance="radio-buttons" arrangement="vertical"/>
+				<graphical_input color="black" background="#E0E0E0" font_size="12pt" isee:show_hover_tip="true"/>
+				<group_input color="black" background="#E0E0E0" font_size="12pt"/>
+				<lamp color="black" background="white" font_size="9pt"/>
+				<gauge color="black" background="white" font_size="9pt" needle_color="#F09F72" bar_color="#EEEEEE" bar_progress_color="black" appearance="radial" num_major_ticks="11" num_minor_ticks="11" show_numeric_value="true"/>
+				<isee:spatial_map color="black" background="white" font_size="12pt"/>
+				<isee:animation_object color="black" background="white" font_size="12pt"/>
+				<isee:navigation_widget color="black" background="white" border_color="#999999" border_width="thin" border_style="solid" item_spacing="6" appearance="tabs" corner_radius="4" selected_item_color="black" selected_item_background="white" item_background="#DDDDDD"/>
+				<isee:shape color="black" background="white" opacity="1" transparent_background="true"/>
+				<isee:selector color="black" background="white"/>
+				<isee:iframe color="black" background="white"/>
+				<isee:financial_table color="black" background="white" auto_fit="true" first_column_width="250" other_column_width="100" header_font_style="normal" header_font_weight="bold" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="14pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
+			</style>
+			<view isee:show_pages="false" background="white" page_width="768" page_height="588" isee:page_cols="2" isee:page_rows="2" isee:scroll_x="5" isee:popup_graphs_are_comparative="true" isee:enable_non_negative_highlights="false" type="stock_flow">
+				<style color="black" background="white" font_style="normal" font_weight="normal" text_decoration="none" text_align="center" vertical_text_align="center" font_color="black" font_family="Arial" font_size="10pt" padding="2" border_color="black" border_width="thin" border_style="none">
+					<stock color="blue" background="white" font_color="blue" font_size="12pt" label_side="top">
+						<shape type="rectangle" width="45" height="35"/>
+					</stock>
+					<flow color="blue" background="white" font_color="blue" font_size="12pt" label_side="bottom"/>
+					<isee:placeholder color="#228B22" background="white" font_color="#228B22" label_side="bottom"/>
+					<module color="blue" background="white" font_color="blue" font_size="12pt" label_side="top">
+						<shape type="rectangle" width="55" height="45"/>
+					</module>
+					<aux color="blue" background="white" font_color="blue" font_size="12pt" label_side="bottom">
+						<shape type="circle" radius="18"/>
+					</aux>
+					<group color="red" background="white" font_color="red" font_size="9pt"/>
+					<connector color="#FF007F" background="white" font_color="#FF007F" font_size="9pt" isee:thickness="1"/>
+					<text_box color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+					<isee:loop_indicator color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+					<numeric_display color="blue" background="white" font_size="9pt" isee:transparent="false"/>
+					<graph color="black" background="white" font_size="12pt" axis_color="#666666" grid_color="#C8C8C8" isee:graph_area_color="white" legend_position="bottom" isee:transparent="false" isee:hide_border="false" axis_title_font_style="normal" axis_title_font_weight="normal" axis_title_text_decoration="none" axis_title_text_align="center" axis_title_vertical_text_align="center" axis_title_font_color="black" axis_title_font_family="Arial" axis_title_font_size="12pt" axis_title_text_padding="2" axis_title_text_border_color="black" axis_title_text_border_width="thin" axis_title_text_border_style="none" axis_label_font_style="normal" axis_label_font_weight="normal" axis_label_text_decoration="none" axis_label_text_align="center" axis_label_vertical_text_align="center" axis_label_font_color="black" axis_label_font_family="Arial" axis_label_font_size="9pt" axis_label_text_padding="2" axis_label_text_border_color="black" axis_label_text_border_width="thin" axis_label_text_border_style="none">
+						<isee:series_styles>
+							<isee:series_style color="blue" thickness="1"/>
+							<isee:series_style color="red" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="fuchsia" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="#008F44" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#FF7F00" thickness="1"/>
+							<isee:series_style color="#7F00FF" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="#0CA0FF" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="lime" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#FF007F" thickness="1"/>
+							<isee:series_style color="aqua" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="#F586FF" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="black" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#C8C8C8" thickness="1"/>
+						</isee:series_styles>
+					</graph>
+					<table color="black" background="#E0E0E0" text_align="right" font_size="12pt" orientation="vertical" wrap_text="false" isee:auto_fit="true" isee:use_alternate_row_colors="false" isee:unlimited_table_length="false" blank_column_width="80" column_width="160" interval="1" report_balances="beginning" report_flows="instantaneous" header_font_style="normal" header_font_weight="normal" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="12pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
+				</style>
+				<stock label_side="center" x="392.5" y="176.5" width="68" height="54" name="Children in\nFoster\nPlacements"/>
+				<flow x="330" y="199" name="Entering\nPlacement">
+					<pts>
+						<pt x="279.5" y="199"/>
+						<pt x="392.5" y="199"/>
+					</pts>
+				</flow>
+				<stock label_side="center" x="207.5" y="174.5" width="72" height="54" name="Children not\nin placement"/>
+				<stock label_side="center" x="331.5" y="407.5" width="64" height="55" name="Foster\nPlacements"/>
+				<aux x="331" y="309" name="Homes per children"/>
+				<flow x="285.75" y="435" name="Adding foster\nplacements">
+					<pts>
+						<pt x="240" y="435"/>
+						<pt x="331.5" y="435"/>
+					</pts>
+				</flow>
+				<flow x="442.75" y="435" name="Placements\nleaving">
+					<pts>
+						<pt x="395.5" y="435"/>
+						<pt x="514" y="435"/>
+					</pts>
+				</flow>
+				<connector uid="1" angle="305.727">
+					<from>Children_in_Foster_Placements</from>
+					<to>Remaining_capacity</to>
+				</connector>
+				<connector uid="2" angle="32.8632">
+					<from>Children_not_in_placement</from>
+					<to>Entering_Placement</to>
+				</connector>
+				<aux x="383.5" y="44" name="FR leaving"/>
+				<aux x="693" y="66.5" name="INIT Children in foster placements"/>
+				<aux x="693" y="136" name="INIT Chidlren\nnot in placement"/>
+				<aux x="439.25" y="533" name="Time as placement"/>
+				<connector uid="3" angle="87.9546">
+					<from>Time_as_placement</from>
+					<to>Placements_leaving</to>
+				</connector>
+				<aux x="430.25" y="291" name="Remaining capacity"/>
+				<aux x="698" y="300" name="INIT placements"/>
+				<connector uid="4" angle="186.52">
+					<from>Remaining_capacity</from>
+					<to>Entering_Placement</to>
+				</connector>
+				<aux x="331" y="138" name="Min time for |placement"/>
+				<connector uid="5" angle="269.061">
+					<from>&quot;Min_time_for_|placement&quot;</from>
+					<to>Entering_Placement</to>
+				</connector>
+				<stacked_container uid="6" x="941" y="144">
+					<graph width="350" height="250" type="time_series" isee:points_only="false" show_grid="false" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="5" num_y_labels="3" isee:fill_intensity="0.1" left_axis_multi_scale="false" left_axis_auto_scale="true" left_include_units="true" right_axis_multi_scale="false" right_axis_auto_scale="true" right_include_units="true">
+						<plot color="blue" isee:keep_zero_visible="true" pen_width="1" index="0" show_y_axis="true">
+							<entity name="Children_in_Foster_Placements"/>
+						</plot>
+						<plot color="red" pen_style="dot_dashed" isee:keep_zero_visible="false" pen_width="1" index="1" show_y_axis="true">
+							<entity name="Children_not_in_placement"/>
+						</plot>
+					</graph>
+				</stacked_container>
+				<flow x="331" y="99" name="Leaving Placements">
+					<pts>
+						<pt x="423" y="176.5"/>
+						<pt x="423" y="99"/>
+						<pt x="239" y="99"/>
+						<pt x="239" y="174.5"/>
+					</pts>
+				</flow>
+				<connector uid="7" angle="180">
+					<from>FR_leaving</from>
+					<to>Leaving_Placements</to>
+				</connector>
+				<connector uid="8" angle="96.7456">
+					<from>Children_in_Foster_Placements</from>
+					<to>Leaving_Placements</to>
+				</connector>
+				<aux x="285.75" y="523" name="Min time to\nadd placement"/>
+				<connector uid="9" angle="101.944">
+					<from>Min_time_to_add_placement</from>
+					<to>Adding_foster_placements</to>
+				</connector>
+				<connector uid="10" angle="99.9777">
+					<from>Foster_Placements</from>
+					<to>Placement_gaps</to>
+				</connector>
+				<stacked_container uid="11" x="941" y="410">
+					<graph width="350" height="250" type="time_series" isee:points_only="false" show_grid="false" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="5" num_y_labels="3" isee:fill_intensity="0.1" left_axis_multi_scale="false" left_axis_auto_scale="true" left_include_units="true" right_axis_multi_scale="false" right_axis_auto_scale="true" right_include_units="true">
+						<plot color="blue" isee:keep_zero_visible="true" pen_width="1" index="0" show_y_axis="true">
+							<entity name="Foster_Placements"/>
+						</plot>
+					</graph>
+				</stacked_container>
+				<flow x="502.875" y="206" name="Permentant placements">
+					<pts>
+						<pt x="460.5" y="206"/>
+						<pt x="569.25" y="206"/>
+					</pts>
+				</flow>
+				<connector uid="12" angle="25.9744">
+					<from>Children_in_Foster_Placements</from>
+					<to>Permentant_placements</to>
+				</connector>
+				<connector uid="13" angle="41.257">
+					<from>Foster_Placements</from>
+					<to>Remaining_capacity</to>
+				</connector>
+				<aux x="230" y="291" name="Indicated Homes"/>
+				<connector uid="14" angle="250.201">
+					<from>Children_not_in_placement</from>
+					<to>Indicated_Homes</to>
+				</connector>
+				<connector uid="15" angle="193.878">
+					<from>Children_in_Foster_Placements</from>
+					<to>Indicated_Homes</to>
+				</connector>
+				<connector uid="16" angle="270">
+					<from>Indicated_Homes</from>
+					<to>Placement_gaps</to>
+				</connector>
+				<aux x="524" y="124" name="AT permanent placement"/>
+				<connector uid="17" angle="271.79">
+					<from>AT_permanent_placement</from>
+					<to>Permentant_placements</to>
+				</connector>
+				<flow x="163.25" y="205" name="New children\nentering foster\ncare system">
+					<pts>
+						<pt x="119" y="205"/>
+						<pt x="207.5" y="205"/>
+					</pts>
+				</flow>
+				<aux x="116" y="114" name="Rate of new children entering"/>
+				<connector uid="18" angle="311.424">
+					<from>Rate_of_new_children_entering</from>
+					<to>New_children_entering_foster_care_system</to>
+				</connector>
+				<connector uid="19" angle="10.2794">
+					<from>Homes_per_children</from>
+					<to>Remaining_capacity</to>
+				</connector>
+				<aux x="253.75" y="361" name="Placement gaps"/>
+				<connector uid="20" angle="253.465">
+					<from>Placement_gaps</from>
+					<to>Adding_foster_placements</to>
+				</connector>
+				<connector uid="21" angle="169.895">
+					<from>Homes_per_children</from>
+					<to>Indicated_Homes</to>
+				</connector>
+				<connector uid="22" angle="315.444">
+					<from>Adding_foster_placements</from>
+					<to>Placements_leaving</to>
+				</connector>
+			</view>
+		</views>
+	</model>
+</xmile>
+

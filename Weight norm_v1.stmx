@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xmile version="1.0" xmlns="http://docs.oasis-open.org/xmile/ns/XMILE/v1.0" xmlns:isee="http://iseesystems.com/XMILE">
+	<header>
+		<smile version="1.0" namespace="std, isee"/>
+		<name>Weight norm_v1</name>
+		<uuid>4535590a-fda0-433e-a59b-d0ab9751cf6a</uuid>
+		<vendor>isee systems, inc.</vendor>
+		<product version="2.0.1" isee:build_number="2228" isee:saved_by_v1="true" lang="en">Stella Architect</product>
+	</header>
+	<sim_specs isee:sim_duration="1.5" isee:simulation_delay="0.0306122" isee:restore_on_start="false" method="Euler" time_units="years" isee:instantaneous_flows="false" isee:loop_scores="true" isee:loop_exhaustive_allowed="1000">
+		<start>1</start>
+		<stop>50</stop>
+		<dt reciprocal="true">4</dt>
+	</sim_specs>
+	<isee:prefs show_module_prefix="true" live_update_on_drag="true" show_restore_buttons="false" layer="model" interface_scale_ui="true" interface_max_page_width="10000" interface_max_page_height="10000" interface_min_page_width="0" interface_min_page_height="0" rerun_on_structure_change="false" saved_runs="5" keep="false" rifp="true"/>
+	<isee:multiplayer_settings include_chat="true" allow_observers="false" advance_time_increment="1" observer_start_page="home_page" enabled="false"/>
+	<isee:time_formats default_format="Builtin">
+		<isee:time_format name="Builtin" type="adaptive"/>
+	</isee:time_formats>
+	<default_format/>
+	<model_units>
+		<unit name="People">
+			<eqn/>
+			<alias>person</alias>
+			<alias>persons</alias>
+		</unit>
+		<unit name="Dimensionless">
+			<eqn>1</eqn>
+			<alias>dmnl</alias>
+			<alias>unitless</alias>
+			<alias>fraction</alias>
+		</unit>
+		<unit name="Years">
+			<eqn/>
+			<alias>yr</alias>
+			<alias>year</alias>
+		</unit>
+	</model_units>
+	<model>
+		<variables>
+			<stock name="Overweight">
+				<eqn>INIT_overweight</eqn>
+				<inflow>Normal_to_overweight_incidence_rate</inflow>
+				<inflow>Overweight_birthrate</inflow>
+				<outflow>Overweight_mortality_rate</outflow>
+				<units>people</units>
+			</stock>
+			<stock name="Normal Weight">
+				<eqn>INIT_normal_weight</eqn>
+				<inflow>Normal_weight_birthrate</inflow>
+				<outflow>Normal_to_overweight_incidence_rate</outflow>
+				<outflow>Normal_weight_motrality_rate</outflow>
+				<units>people</units>
+			</stock>
+			<flow name="Normal to overweight incidence rate">
+				<eqn>Normal_Weight*INIT_oveweight_incidence_FR*Relative_energy_balance</eqn>
+				<non_negative/>
+				<units>people/years</units>
+			</flow>
+			<aux name="INIT oveweight incidence FR">
+				<eqn>.01</eqn>
+				<units>1/years</units>
+			</aux>
+			<flow name="Normal weight\nmotrality rate">
+				<eqn>INIT_normal_weight_FR_mortality*Normal_Weight</eqn>
+				<non_negative/>
+				<units>people/years</units>
+			</flow>
+			<flow name="Overweight\nmortality rate">
+				<eqn>Overweight*INIT_overweight_FR_mortality</eqn>
+				<non_negative/>
+				<units>people/years</units>
+			</flow>
+			<aux name="INIT normal weight\nFR mortality">
+				<eqn>.01</eqn>
+				<units>1/years</units>
+			</aux>
+			<aux name="INIT overweight\nFR mortality">
+				<eqn>.02</eqn>
+				<units>1/years</units>
+			</aux>
+			<aux name="Total population">
+				<eqn>Normal_Weight+Overweight</eqn>
+				<units>people</units>
+			</aux>
+			<aux name="INIT normal weight">
+				<eqn>800</eqn>
+				<units>people</units>
+			</aux>
+			<aux name="INIT overweight">
+				<eqn>200</eqn>
+				<units>people</units>
+			</aux>
+			<flow name="Overweight birthrate">
+				<eqn>Overweight*FR_Birth</eqn>
+				<non_negative/>
+				<units>people/years</units>
+			</flow>
+			<flow name="Normal weight birthrate">
+				<eqn>Normal_Weight*FR_Birth</eqn>
+				<non_negative/>
+				<units>people/years</units>
+			</flow>
+			<aux name="FR Birth">
+				<eqn>.03</eqn>
+				<units>1/years</units>
+			</aux>
+			<stock name="Weight norm">
+				<eqn>INIT_proportion_overweight</eqn>
+				<inflow>Change_in_weight_norm</inflow>
+				<non_negative/>
+				<units>dmnl</units>
+			</stock>
+			<flow name="Change in weight norm">
+				<eqn>(Proportion_overweight-Weight_norm)/Adj_time_weight_norm</eqn>
+				<units>1/years</units>
+			</flow>
+			<aux name="Proportion overweight">
+				<eqn>Overweight/(Normal_Weight+Overweight)</eqn>
+				<units>dmnl</units>
+			</aux>
+			<aux name="Adj time weight norm">
+				<eqn>5</eqn>
+				<units>years</units>
+			</aux>
+			<aux name="Relative energy balance">
+				<eqn>Weight_norm/INIT_proportion_overweight</eqn>
+				<units>dmnl</units>
+			</aux>
+			<aux name="INIT proportion overweight">
+				<eqn>INIT_normal_weight/(INIT_normal_weight+INIT_overweight)</eqn>
+				<units>dmnl</units>
+			</aux>
+		</variables>
+		<views>
+			<style color="black" background="white" font_style="normal" font_weight="normal" text_decoration="none" text_align="center" vertical_text_align="center" font_color="black" font_family="Arial" font_size="10pt" padding="2" border_color="black" border_width="thin" border_style="none">
+				<text_box color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+				<isee:loop_indicator color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+				<numeric_display color="blue" background="white" font_size="9pt" isee:transparent="false"/>
+				<graph color="black" background="white" font_size="12pt" axis_color="#666666" grid_color="#C8C8C8" isee:graph_area_color="white" legend_position="bottom" isee:transparent="false" isee:hide_border="false" axis_title_font_style="normal" axis_title_font_weight="normal" axis_title_text_decoration="none" axis_title_text_align="center" axis_title_vertical_text_align="center" axis_title_font_color="black" axis_title_font_family="Arial" axis_title_font_size="12pt" axis_title_text_padding="2" axis_title_text_border_color="black" axis_title_text_border_width="thin" axis_title_text_border_style="none" axis_label_font_style="normal" axis_label_font_weight="normal" axis_label_text_decoration="none" axis_label_text_align="center" axis_label_vertical_text_align="center" axis_label_font_color="black" axis_label_font_family="Arial" axis_label_font_size="9pt" axis_label_text_padding="2" axis_label_text_border_color="black" axis_label_text_border_width="thin" axis_label_text_border_style="none">
+					<isee:series_styles>
+						<isee:series_style color="blue" thickness="1"/>
+						<isee:series_style color="red" thickness="1" pen_style="dot_dashed"/>
+						<isee:series_style color="fuchsia" thickness="1" pen_style="dotted"/>
+						<isee:series_style color="#008F44" thickness="1" pen_style="dashed"/>
+						<isee:series_style color="#FF7F00" thickness="1"/>
+						<isee:series_style color="#7F00FF" thickness="1" pen_style="dot_dashed"/>
+						<isee:series_style color="#0CA0FF" thickness="1" pen_style="dotted"/>
+						<isee:series_style color="lime" thickness="1" pen_style="dashed"/>
+						<isee:series_style color="#FF007F" thickness="1"/>
+						<isee:series_style color="aqua" thickness="1" pen_style="dot_dashed"/>
+						<isee:series_style color="#F586FF" thickness="1" pen_style="dotted"/>
+						<isee:series_style color="black" thickness="1" pen_style="dashed"/>
+						<isee:series_style color="#C8C8C8" thickness="1"/>
+					</isee:series_styles>
+				</graph>
+				<table color="black" background="#E0E0E0" text_align="right" font_size="12pt" orientation="vertical" wrap_text="false" isee:auto_fit="true" isee:use_alternate_row_colors="false" isee:unlimited_table_length="false" blank_column_width="80" column_width="160" interval="1" report_balances="ending" report_flows="summed" header_font_style="normal" header_font_weight="normal" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="12pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
+				<button color="black" background="#E0E0E0" font_size="12pt" border_width="thin" border_style="solid" transparent="false" corner_radius="0" isee:flat="false" icon_side="top" isee:highlight_on_hover="false" isee:highlight_color="#959595"/>
+				<isee:annotation color="black" background="#E0E0E0" font_size="12pt" border_width="thin" border_style="solid" transparent="false" corner_radius="0" isee:flat="false" icon_side="top" isee:highlight_on_hover="false" isee:highlight_color="#959595" popup_corner_radius="0" popup_background_color="#FFFECF"/>
+				<slider color="#66CC66" background="#E0E0E0" font_size="12pt" num_ticks="3" label_side="top" wrap_title="true" vertical="false" isee:fancy_appearance="false" isee:show_hover_tip="when_deciding" input_expands="true" input_width="100"/>
+				<isee:sim_speed_slider color="black" background="white"/>
+				<isee:time_slider color="#E95F74" background="silver"/>
+				<isee:pie_input color="black" background="white" font_size="12pt" legend_position="bottom" isee:transparent="false"/>
+				<knob color="#66CC66" background="#E0E0E0" font_size="12pt" label_side="bottom" wrap_title="true"/>
+				<numeric_input color="black" background="#E0E0E0" font_size="12pt" label_side="left" wrap_title="true" input_expands="false" input_width="100"/>
+				<switch color="black" background="#E0E0E0" font_size="12pt" label_side="top" wrap_title="true" isee:appearance="switch" isee:on_color="green"/>
+				<options color="black" background="white" appearance="radio-buttons" arrangement="vertical"/>
+				<graphical_input color="black" background="#E0E0E0" font_size="12pt" isee:show_hover_tip="true"/>
+				<group_input color="black" background="#E0E0E0" font_size="12pt"/>
+				<lamp color="black" background="white" font_size="9pt"/>
+				<gauge color="black" background="white" font_size="9pt" needle_color="#F09F72" bar_color="#EEEEEE" bar_progress_color="black" appearance="radial" num_major_ticks="11" num_minor_ticks="11" show_numeric_value="true"/>
+				<isee:spatial_map color="black" background="white" font_size="12pt"/>
+				<isee:animation_object color="black" background="white" font_size="12pt"/>
+				<isee:navigation_widget color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt" border_color="#999999" border_width="thin" border_style="solid" item_spacing="6" appearance="tabs" corner_radius="4" selected_item_color="black" selected_item_background="white" item_background="#DDDDDD"/>
+				<isee:shape color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt" border_width="thin" border_style="solid" opacity="1" transparent_background="true"/>
+				<isee:selector color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+				<isee:iframe color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt" border_width="thin" border_style="solid"/>
+				<isee:financial_table color="black" background="#E0E0E0" text_align="right" font_size="12pt" auto_fit="true" first_column_width="250" other_column_width="100" header_font_style="normal" header_font_weight="bold" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="14pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
+			</style>
+			<view isee:show_pages="false" background="white" page_width="768" page_height="588" isee:page_cols="2" isee:page_rows="2" isee:popup_graphs_are_comparative="true" isee:enable_non_negative_highlights="false" type="stock_flow">
+				<style color="black" background="white" font_style="normal" font_weight="normal" text_decoration="none" text_align="center" vertical_text_align="center" font_color="black" font_family="Arial" font_size="10pt" padding="2" border_color="black" border_width="thin" border_style="none">
+					<stock color="blue" background="white" font_color="blue" font_family="Avenir Next" font_size="9pt" label_side="top">
+						<shape type="rectangle" width="45" height="35"/>
+					</stock>
+					<flow color="blue" background="white" font_color="blue" font_family="Avenir Next" font_size="9pt" label_side="bottom"/>
+					<isee:placeholder color="#228B22" background="white" font_color="#228B22" font_family="Avenir Next" font_size="9pt" label_side="bottom"/>
+					<module color="blue" background="white" font_color="blue" font_family="Avenir Next" font_size="9pt" label_side="top">
+						<shape type="rectangle" width="55" height="45"/>
+					</module>
+					<aux color="blue" background="white" font_color="blue" font_family="Avenir Next" font_size="9pt" label_side="bottom">
+						<shape type="circle" radius="18"/>
+					</aux>
+					<group color="red" background="white" font_color="red" font_family="Avenir Next" font_size="9pt"/>
+					<connector color="#FF007F" background="white" font_color="#FF007F" font_size="9pt" isee:thickness="1"/>
+					<text_box color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+					<isee:loop_indicator color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+					<numeric_display color="blue" background="white" font_size="9pt" isee:transparent="false"/>
+					<graph color="black" background="white" font_size="12pt" axis_color="#666666" grid_color="#C8C8C8" isee:graph_area_color="white" legend_position="bottom" isee:transparent="false" isee:hide_border="false" axis_title_font_style="normal" axis_title_font_weight="normal" axis_title_text_decoration="none" axis_title_text_align="center" axis_title_vertical_text_align="center" axis_title_font_color="black" axis_title_font_family="Arial" axis_title_font_size="12pt" axis_title_text_padding="2" axis_title_text_border_color="black" axis_title_text_border_width="thin" axis_title_text_border_style="none" axis_label_font_style="normal" axis_label_font_weight="normal" axis_label_text_decoration="none" axis_label_text_align="center" axis_label_vertical_text_align="center" axis_label_font_color="black" axis_label_font_family="Arial" axis_label_font_size="9pt" axis_label_text_padding="2" axis_label_text_border_color="black" axis_label_text_border_width="thin" axis_label_text_border_style="none">
+						<isee:series_styles>
+							<isee:series_style color="blue" thickness="1"/>
+							<isee:series_style color="red" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="fuchsia" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="#008F44" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#FF7F00" thickness="1"/>
+							<isee:series_style color="#7F00FF" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="#0CA0FF" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="lime" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#FF007F" thickness="1"/>
+							<isee:series_style color="aqua" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="#F586FF" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="black" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#C8C8C8" thickness="1"/>
+						</isee:series_styles>
+					</graph>
+					<table color="black" background="#E0E0E0" text_align="right" font_size="12pt" orientation="vertical" wrap_text="false" isee:auto_fit="true" isee:use_alternate_row_colors="false" isee:unlimited_table_length="false" blank_column_width="80" column_width="160" interval="1" report_balances="ending" report_flows="summed" header_font_style="normal" header_font_weight="normal" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="12pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
+				</style>
+				<stock x="396" y="199" name="Overweight"/>
+				<stock x="193" y="199" name="Normal Weight"/>
+				<flow x="288.5" y="199" name="Normal to overweight incidence rate">
+					<pts>
+						<pt x="215.5" y="199"/>
+						<pt x="373.5" y="199"/>
+					</pts>
+				</flow>
+				<aux x="293" y="124" name="INIT oveweight incidence FR"/>
+				<connector uid="1" angle="303.69">
+					<from>INIT_oveweight_incidence_FR</from>
+					<to>Normal_to_overweight_incidence_rate</to>
+				</connector>
+				<connector uid="2" angle="335.376">
+					<from>Normal_Weight</from>
+					<to>Normal_to_overweight_incidence_rate</to>
+				</connector>
+				<flow x="194" y="125.75" name="Normal weight\nmotrality rate">
+					<pts>
+						<pt x="194" y="181.5"/>
+						<pt x="194" y="49"/>
+					</pts>
+				</flow>
+				<connector uid="3" angle="67.4794">
+					<from>Normal_Weight</from>
+					<to>Normal_weight_motrality_rate</to>
+				</connector>
+				<flow x="396" y="126.25" name="Overweight\nmortality rate">
+					<pts>
+						<pt x="396" y="181.5"/>
+						<pt x="396" y="50"/>
+					</pts>
+				</flow>
+				<connector uid="4" angle="54.211">
+					<from>Overweight</from>
+					<to>Overweight_mortality_rate</to>
+				</connector>
+				<aux x="127" y="73" name="INIT normal weight\nFR mortality"/>
+				<connector uid="5" angle="356.532">
+					<from>INIT_normal_weight_FR_mortality</from>
+					<to>Normal_weight_motrality_rate</to>
+				</connector>
+				<aux x="470" y="88" name="INIT overweight\nFR mortality"/>
+				<connector uid="6" angle="188.13">
+					<from>INIT_overweight_FR_mortality</from>
+					<to>Overweight_mortality_rate</to>
+				</connector>
+				<aux x="298" y="28" name="Total population"/>
+				<connector uid="7" angle="51.3402">
+					<from>Normal_Weight</from>
+					<to>Total_population</to>
+				</connector>
+				<connector uid="8" angle="126.119">
+					<from>Overweight</from>
+					<to>Total_population</to>
+				</connector>
+				<aux x="665" y="98" name="INIT normal weight"/>
+				<aux x="665" y="164" name="INIT overweight"/>
+				<flow x="476.25" y="199" name="Overweight birthrate">
+					<pts>
+						<pt x="534" y="199"/>
+						<pt x="418.5" y="199"/>
+					</pts>
+				</flow>
+				<flow x="121.75" y="203" name="Normal weight birthrate">
+					<pts>
+						<pt x="73" y="203"/>
+						<pt x="170.5" y="203"/>
+					</pts>
+				</flow>
+				<aux x="56" y="134" name="FR Birth"/>
+				<connector uid="9" angle="4.76364">
+					<from>FR_Birth</from>
+					<to>Normal_weight_birthrate</to>
+				</connector>
+				<connector uid="10" angle="155.821">
+					<from>Normal_Weight</from>
+					<to>Normal_weight_birthrate</to>
+				</connector>
+				<connector uid="11" angle="176.634">
+					<from>
+						<alias uid="12"/>
+					</from>
+					<to>Overweight_birthrate</to>
+				</connector>
+				<connector uid="13" angle="28.5231">
+					<from>Overweight</from>
+					<to>Overweight_birthrate</to>
+				</connector>
+				<stock x="338" y="350" name="Weight norm"/>
+				<flow x="276.25" y="345" name="Change in weight norm">
+					<pts>
+						<pt x="225" y="345"/>
+						<pt x="315.5" y="345"/>
+					</pts>
+				</flow>
+				<aux x="311" y="414" name="Proportion overweight"/>
+				<connector uid="14" angle="250.769">
+					<from>Normal_Weight</from>
+					<to>Proportion_overweight</to>
+				</connector>
+				<connector uid="15" angle="308.66">
+					<from>Overweight</from>
+					<to>Proportion_overweight</to>
+				</connector>
+				<connector uid="16" angle="140.194">
+					<from>Proportion_overweight</from>
+					<to>Change_in_weight_norm</to>
+				</connector>
+				<connector uid="17" angle="200.695">
+					<from>Weight_norm</from>
+					<to>Change_in_weight_norm</to>
+				</connector>
+				<aux x="224.5" y="289" name="Adj time weight norm"/>
+				<connector uid="18" angle="312.741">
+					<from>Adj_time_weight_norm</from>
+					<to>Change_in_weight_norm</to>
+				</connector>
+				<aux x="338" y="275" name="Relative energy balance"/>
+				<connector uid="19" angle="68.4287">
+					<from>Weight_norm</from>
+					<to>Relative_energy_balance</to>
+				</connector>
+				<connector uid="20" angle="110.376">
+					<from>Relative_energy_balance</from>
+					<to>Normal_to_overweight_incidence_rate</to>
+				</connector>
+				<text_box uid="21" x="637" y="260" width="260" height="58">Source: SSDL Molecules Library 2014</text_box>
+				<aux x="767" y="141" name="INIT proportion overweight"/>
+				<connector uid="22" angle="355.914">
+					<from>INIT_normal_weight</from>
+					<to>INIT_proportion_overweight</to>
+				</connector>
+				<connector uid="23" angle="8.36589">
+					<from>INIT_overweight</from>
+					<to>INIT_proportion_overweight</to>
+				</connector>
+				<connector uid="24" angle="196.991">
+					<from>INIT_proportion_overweight</from>
+					<to>Relative_energy_balance</to>
+				</connector>
+				<alias font_style="italic" uid="12" x="521" y="132" width="18" height="18">
+					<of>FR_Birth</of>
+				</alias>
+			</view>
+		</views>
+	</model>
+</xmile>
+
