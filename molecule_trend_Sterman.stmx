@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xmile version="1.0" xmlns="http://docs.oasis-open.org/xmile/ns/XMILE/v1.0" xmlns:isee="http://iseesystems.com/XMILE">
+	<header>
+		<smile version="1.0" namespace="std, isee"/>
+		<name>molecule_trend_Sterman</name>
+		<uuid>115be552-1da9-4271-b367-80d05e6ebb3b</uuid>
+		<vendor>isee systems, inc.</vendor>
+		<product version="2.0.1" isee:build_number="2228" isee:saved_by_v1="true" lang="en">Stella Architect</product>
+	</header>
+	<sim_specs isee:sim_duration="1.4375" isee:simulation_delay="0.0625" isee:restore_on_start="false" method="Euler" time_units="Year" isee:instantaneous_flows="true" isee:loop_scores="true" isee:loop_exhaustive_allowed="1000">
+		<start>1</start>
+		<stop>24</stop>
+		<dt reciprocal="true">25</dt>
+	</sim_specs>
+	<isee:prefs show_module_prefix="true" live_update_on_drag="true" show_restore_buttons="false" layer="model" interface_scale_ui="true" interface_max_page_width="10000" interface_max_page_height="10000" interface_min_page_width="0" interface_min_page_height="0" rerun_on_structure_change="false" saved_runs="5" keep="false" rifp="true"/>
+	<isee:multiplayer_settings include_chat="true" allow_observers="false" advance_time_increment="1" observer_start_page="home_page" enabled="false"/>
+	<isee:time_formats default_format="Builtin">
+		<isee:time_format name="Builtin" type="adaptive"/>
+	</isee:time_formats>
+	<default_format/>
+	<model_units>
+		<unit name="Years">
+			<eqn/>
+			<alias>yr</alias>
+			<alias>year</alias>
+		</unit>
+	</model_units>
+	<model>
+		<isee:extra_collection_variables>
+			<isee:extra_collection_variable name="Perceived_Present_condition"/>
+			<isee:extra_collection_variable name="Indicated_Trend"/>
+			<isee:extra_collection_variable name="Reference_Condition"/>
+		</isee:extra_collection_variables>
+		<variables>
+			<group name="Generic" run="false">
+				<entity name="Reference_Condition"/>
+				<entity name="Change_in_Historical_Quantity"/>
+				<entity name="Perceived_Present_condition"/>
+				<entity name="Change_in_perceived_quantity"/>
+				<entity name="Time_to_perceive_trend"/>
+				<entity name="Indicated_Trend"/>
+				<entity name="Perceived_trend"/>
+				<entity name="Change_in_TREND"/>
+			</group>
+			<group name="Generic Parameters" run="false">
+				<entity name="INIT_Perceived_Quantity"/>
+				<entity name="Time_to_Perceive"/>
+				<entity name="INIT_Historical_Quantity"/>
+				<entity name="Actual_Quantity"/>
+				<entity name="Duration_over_which_to_calculate_trend"/>
+			</group>
+			<aux name="INIT Perceived\nQuantity">
+				<eqn>100</eqn>
+				<units>Quantity</units>
+			</aux>
+			<aux name="Time to Perceive">
+				<eqn>2</eqn>
+				<units>Years</units>
+			</aux>
+			<aux name="INIT Historical\nQuantity">
+				<eqn>100</eqn>
+				<units>Quantity</units>
+			</aux>
+			<stock name="Reference Condition">
+				<eqn>INIT_Historical_Quantity</eqn>
+				<inflow>Change_in_Historical_Quantity</inflow>
+				<non_negative/>
+				<units>Quantity</units>
+			</stock>
+			<flow name="Change in\nHistorical Quantity">
+				<eqn>(Perceived_Present_condition-Reference_Condition)/Duration_over_which_to_calculate_trend</eqn>
+				<units>Quantity/Year</units>
+			</flow>
+			<aux name="Indicated\nTrend">
+				<eqn>(Perceived_Present_condition-Reference_Condition)/(Reference_Condition*Duration_over_which_to_calculate_trend)</eqn>
+				<units>1/year</units>
+			</aux>
+			<stock name="Perceived\nPresent\ncondition">
+				<eqn>INIT_Perceived_Quantity</eqn>
+				<inflow>Change_in_perceived_quantity</inflow>
+				<non_negative/>
+				<units>Quantity</units>
+			</stock>
+			<flow name="Change in\nperceived quantity">
+				<eqn>(Actual_Quantity-Perceived_Present_condition)/Time_to_Perceive</eqn>
+				<units>Quantity/Year</units>
+			</flow>
+			<aux name="Actual Quantity">
+				<eqn>150</eqn>
+				<units>Quantity</units>
+			</aux>
+			<aux name="Duration over which\nto calculate trend">
+				<eqn>10</eqn>
+				<units>Years</units>
+			</aux>
+			<stock name="Perceived trend">
+				<eqn>0</eqn>
+				<inflow>Change_in_TREND</inflow>
+				<units>1/years</units>
+			</stock>
+			<flow name="Change in\nTREND">
+				<eqn>(Indicated_Trend-Perceived_trend)/Time_to_perceive_trend</eqn>
+				<units>1/years/Year</units>
+			</flow>
+			<aux name="Time to\nperceive trend">
+				<eqn>1</eqn>
+				<units>years</units>
+			</aux>
+		</variables>
+		<views>
+			<style color="black" background="white" font_style="normal" font_weight="normal" text_decoration="none" text_align="center" vertical_text_align="center" font_color="black" font_family="Arial" font_size="10pt" padding="2" border_color="black" border_width="thin" border_style="none">
+				<text_box color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+				<isee:loop_indicator color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+				<numeric_display color="blue" background="white" font_size="9pt" isee:transparent="false"/>
+				<graph color="black" background="white" font_size="12pt" axis_color="#666666" grid_color="#C8C8C8" isee:graph_area_color="white" legend_position="bottom" isee:transparent="false" isee:hide_border="false" axis_title_font_style="normal" axis_title_font_weight="normal" axis_title_text_decoration="none" axis_title_text_align="center" axis_title_vertical_text_align="center" axis_title_font_color="black" axis_title_font_family="Arial" axis_title_font_size="12pt" axis_title_text_padding="2" axis_title_text_border_color="black" axis_title_text_border_width="thin" axis_title_text_border_style="none" axis_label_font_style="normal" axis_label_font_weight="normal" axis_label_text_decoration="none" axis_label_text_align="center" axis_label_vertical_text_align="center" axis_label_font_color="black" axis_label_font_family="Arial" axis_label_font_size="9pt" axis_label_text_padding="2" axis_label_text_border_color="black" axis_label_text_border_width="thin" axis_label_text_border_style="none">
+					<isee:series_styles>
+						<isee:series_style color="blue" thickness="1"/>
+						<isee:series_style color="red" thickness="1" pen_style="dot_dashed"/>
+						<isee:series_style color="fuchsia" thickness="1" pen_style="dotted"/>
+						<isee:series_style color="#008F44" thickness="1" pen_style="dashed"/>
+						<isee:series_style color="#FF7F00" thickness="1"/>
+						<isee:series_style color="#7F00FF" thickness="1" pen_style="dot_dashed"/>
+						<isee:series_style color="#0CA0FF" thickness="1" pen_style="dotted"/>
+						<isee:series_style color="lime" thickness="1" pen_style="dashed"/>
+						<isee:series_style color="#FF007F" thickness="1"/>
+						<isee:series_style color="aqua" thickness="1" pen_style="dot_dashed"/>
+						<isee:series_style color="#F586FF" thickness="1" pen_style="dotted"/>
+						<isee:series_style color="black" thickness="1" pen_style="dashed"/>
+						<isee:series_style color="#C8C8C8" thickness="1"/>
+					</isee:series_styles>
+				</graph>
+				<table color="black" background="#E0E0E0" text_align="right" font_size="12pt" orientation="vertical" wrap_text="false" isee:auto_fit="true" isee:use_alternate_row_colors="false" isee:unlimited_table_length="false" blank_column_width="80" column_width="160" interval="1" report_balances="beginning" report_flows="instantaneous" header_font_style="normal" header_font_weight="normal" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="12pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
+				<button color="black" background="#E0E0E0" font_size="12pt" border_width="thin" border_style="solid" transparent="false" corner_radius="0" isee:flat="false" icon_side="top" isee:highlight_on_hover="false" isee:highlight_color="#959595"/>
+				<isee:annotation color="black" background="#E0E0E0" font_size="12pt" border_width="thin" border_style="solid" transparent="false" corner_radius="0" isee:flat="false" icon_side="top" isee:highlight_on_hover="false" isee:highlight_color="#959595" popup_corner_radius="0" popup_background_color="#FFFECF"/>
+				<slider color="black" background="#E0E0E0" font_size="12pt" num_ticks="3" label_side="top" wrap_title="true" vertical="false" isee:fancy_appearance="false" isee:show_hover_tip="when_deciding" input_expands="true" input_width="100"/>
+				<isee:sim_speed_slider color="black" background="white"/>
+				<isee:time_slider color="black" background="white"/>
+				<isee:pie_input color="black" background="white" font_size="12pt" legend_position="bottom" isee:transparent="false"/>
+				<knob color="#66CC66" background="#E0E0E0" font_size="12pt" label_side="bottom" wrap_title="true"/>
+				<numeric_input color="black" background="#E0E0E0" font_size="12pt" label_side="left" wrap_title="true" input_expands="false" input_width="100"/>
+				<switch color="black" background="#E0E0E0" font_size="12pt" label_side="top" wrap_title="true" isee:appearance="switch" isee:on_color="green"/>
+				<options color="black" background="white" appearance="radio-buttons" arrangement="vertical"/>
+				<graphical_input color="black" background="#E0E0E0" font_size="12pt" isee:show_hover_tip="true"/>
+				<group_input color="black" background="#E0E0E0" font_size="12pt"/>
+				<lamp color="black" background="white" font_size="9pt"/>
+				<gauge color="black" background="white" font_size="9pt" needle_color="#F09F72" bar_color="#EEEEEE" bar_progress_color="black" appearance="radial" num_major_ticks="11" num_minor_ticks="11" show_numeric_value="true"/>
+				<isee:spatial_map color="black" background="white" font_size="12pt"/>
+				<isee:animation_object color="black" background="white" font_size="12pt"/>
+				<isee:navigation_widget color="black" background="white" border_color="#999999" border_width="thin" border_style="solid" item_spacing="6" appearance="tabs" corner_radius="4" selected_item_color="black" selected_item_background="white" item_background="#DDDDDD"/>
+				<isee:shape color="black" background="white" opacity="1" transparent_background="true"/>
+				<isee:selector color="black" background="white"/>
+				<isee:iframe color="black" background="white"/>
+				<isee:financial_table color="black" background="white" auto_fit="true" first_column_width="250" other_column_width="100" header_font_style="normal" header_font_weight="bold" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="14pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
+			</style>
+			<view isee:show_pages="false" background="white" page_width="768" page_height="588" isee:page_cols="2" isee:page_rows="2" isee:popup_graphs_are_comparative="true" isee:enable_non_negative_highlights="false" type="stock_flow">
+				<style color="black" background="white" font_style="normal" font_weight="normal" text_decoration="none" text_align="center" vertical_text_align="center" font_color="black" font_family="Arial" font_size="10pt" padding="2" border_color="black" border_width="thin" border_style="none">
+					<stock color="blue" background="white" font_color="blue" font_size="12pt" label_side="top">
+						<shape type="rectangle" width="45" height="35"/>
+					</stock>
+					<flow color="blue" background="white" font_color="blue" font_size="12pt" label_side="bottom"/>
+					<isee:placeholder color="#228B22" background="white" font_color="#228B22" label_side="bottom"/>
+					<module color="blue" background="white" font_color="blue" font_size="12pt" label_side="top">
+						<shape type="rectangle" width="55" height="45"/>
+					</module>
+					<aux color="blue" background="white" font_color="blue" font_size="12pt" label_side="bottom">
+						<shape type="circle" radius="18"/>
+					</aux>
+					<group color="red" background="white" font_color="red" font_size="9pt"/>
+					<connector color="#FF007F" background="white" font_color="#FF007F" font_size="9pt" isee:thickness="1"/>
+					<text_box color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+					<isee:loop_indicator color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+					<numeric_display color="blue" background="white" font_size="9pt" isee:transparent="false"/>
+					<graph color="black" background="white" font_size="12pt" axis_color="#666666" grid_color="#C8C8C8" isee:graph_area_color="white" legend_position="bottom" isee:transparent="false" isee:hide_border="false" axis_title_font_style="normal" axis_title_font_weight="normal" axis_title_text_decoration="none" axis_title_text_align="center" axis_title_vertical_text_align="center" axis_title_font_color="black" axis_title_font_family="Arial" axis_title_font_size="12pt" axis_title_text_padding="2" axis_title_text_border_color="black" axis_title_text_border_width="thin" axis_title_text_border_style="none" axis_label_font_style="normal" axis_label_font_weight="normal" axis_label_text_decoration="none" axis_label_text_align="center" axis_label_vertical_text_align="center" axis_label_font_color="black" axis_label_font_family="Arial" axis_label_font_size="9pt" axis_label_text_padding="2" axis_label_text_border_color="black" axis_label_text_border_width="thin" axis_label_text_border_style="none">
+						<isee:series_styles>
+							<isee:series_style color="blue" thickness="1"/>
+							<isee:series_style color="red" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="fuchsia" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="#008F44" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#FF7F00" thickness="1"/>
+							<isee:series_style color="#7F00FF" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="#0CA0FF" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="lime" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#FF007F" thickness="1"/>
+							<isee:series_style color="aqua" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="#F586FF" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="black" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#C8C8C8" thickness="1"/>
+						</isee:series_styles>
+					</graph>
+					<table color="black" background="#E0E0E0" text_align="right" font_size="12pt" orientation="vertical" wrap_text="false" isee:auto_fit="true" isee:use_alternate_row_colors="false" isee:unlimited_table_length="false" blank_column_width="80" column_width="160" interval="1" report_balances="beginning" report_flows="instantaneous" header_font_style="normal" header_font_weight="normal" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="12pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
+				</style>
+				<stacked_container uid="1" x="774" y="54" width="350" height="306">
+					<graph width="350" height="306" type="time_series" isee:points_only="false" show_grid="false" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="5" num_y_labels="3" isee:fill_intensity="0.1" left_axis_multi_scale="false" left_axis_auto_scale="true" left_include_units="true" right_axis_multi_scale="false" right_axis_auto_scale="true" right_include_units="true">
+						<plot color="blue" isee:keep_zero_visible="true" pen_width="1" index="0" right_axis="true" show_y_axis="true">
+							<entity name="Indicated_Trend"/>
+						</plot>
+						<plot color="red" pen_style="dot_dashed" isee:keep_zero_visible="false" pen_width="1" index="0" show_y_axis="true">
+							<entity name="Reference_Condition"/>
+						</plot>
+						<plot color="fuchsia" pen_style="dotted" isee:keep_zero_visible="true" pen_width="1" index="1" show_y_axis="true">
+							<entity name="Perceived_Present_condition"/>
+						</plot>
+						<plot color="#008F44" pen_style="dashed" isee:keep_zero_visible="true" pen_width="1" index="1" right_axis="true" show_y_axis="true">
+							<entity name="Perceived_trend"/>
+						</plot>
+					</graph>
+				</stacked_container>
+				<group locked="false" x="58" y="68" width="535" height="365" name="Generic">
+					<item uid="2"/>
+					<item uid="3"/>
+					<item uid="4"/>
+				</group>
+				<text_box uid="5" x="777" y="312" width="260" height="103">Source - Sterman 2000, P634 
+</text_box>
+				<group locked="false" x="594" y="68" width="173" height="366" name="Generic Parameters"/>
+				<aux label_side="right" x="631" y="106" name="INIT Perceived\nQuantity"/>
+				<aux label_side="right" x="631" y="230" name="Time to Perceive"/>
+				<aux label_side="right" x="631" y="152" name="INIT Historical\nQuantity"/>
+				<stock label_side="center" x="296.5" y="267.5" width="78" height="55" name="Reference Condition"/>
+				<flow x="253.25" y="293" name="Change in\nHistorical Quantity">
+					<pts>
+						<pt x="198" y="293"/>
+						<pt x="296.5" y="293"/>
+					</pts>
+				</flow>
+				<aux x="411" y="233" name="Indicated\nTrend"/>
+				<stock label_side="center" x="247.5" y="165" width="71" height="48" name="Perceived\nPresent\ncondition"/>
+				<flow x="209.75" y="189" name="Change in\nperceived quantity">
+					<pts>
+						<pt x="160" y="189"/>
+						<pt x="247.5" y="189"/>
+					</pts>
+				</flow>
+				<aux label_side="right" x="631" y="185" name="Actual Quantity"/>
+				<connector uid="6" angle="149.265">
+					<from>Perceived_Present_condition</from>
+					<to>Change_in_perceived_quantity</to>
+				</connector>
+				<connector uid="7" angle="206.131">
+					<from>Reference_Condition</from>
+					<to>Change_in_Historical_Quantity</to>
+				</connector>
+				<aux label_side="right" x="634" y="276" name="Duration over which\nto calculate trend"/>
+				<connector uid="8" angle="9.97206">
+					<from>Reference_Condition</from>
+					<to>Indicated_Trend</to>
+				</connector>
+				<connector uid="9" angle="317.42">
+					<from>Perceived_Present_condition</from>
+					<to>Indicated_Trend</to>
+				</connector>
+				<connector uid="10" angle="239.744">
+					<from>Perceived_Present_condition</from>
+					<to>Change_in_Historical_Quantity</to>
+				</connector>
+				<connector uid="11" angle="305.538">
+					<from>
+						<alias uid="2"/>
+					</from>
+					<to>Change_in_perceived_quantity</to>
+				</connector>
+				<connector uid="12" angle="229.268">
+					<from>
+						<alias uid="3"/>
+					</from>
+					<to>Change_in_perceived_quantity</to>
+				</connector>
+				<connector uid="13" angle="180">
+					<from>
+						<alias uid="4"/>
+					</from>
+					<to>Change_in_Historical_Quantity</to>
+				</connector>
+				<connector uid="14" angle="17.1027">
+					<from>
+						<alias uid="4"/>
+					</from>
+					<to>Indicated_Trend</to>
+				</connector>
+				<alias color="blue" background="white" font_style="italic" uid="2" x="145" y="108" width="18" height="18">
+					<shape type="circle" radius="18"/>
+					<of>Actual_Quantity</of>
+				</alias>
+				<alias font_style="italic" uid="3" x="251" y="99" width="18" height="18">
+					<of>Time_to_Perceive</of>
+				</alias>
+				<alias font_style="italic" label_side="bottom" uid="4" x="342" y="360" width="18" height="18">
+					<of>Duration_over_which_to_calculate_trend</of>
+				</alias>
+				<stock x="482.5" y="145" width="65" height="51" name="Perceived trend"/>
+				<flow x="434.75" y="165" name="Change in\nTREND">
+					<pts>
+						<pt x="375" y="165"/>
+						<pt x="482.5" y="165"/>
+					</pts>
+				</flow>
+				<connector uid="15" angle="49.5378">
+					<from>Indicated_Trend</from>
+					<to>Change_in_TREND</to>
+				</connector>
+				<connector uid="16" angle="99.1805">
+					<from>Perceived_trend</from>
+					<to>Change_in_TREND</to>
+				</connector>
+				<aux x="373" y="99" name="Time to\nperceive trend"/>
+				<connector uid="17" angle="302.735">
+					<from>Time_to_perceive_trend</from>
+					<to>Change_in_TREND</to>
+				</connector>
+			</view>
+		</views>
+	</model>
+</xmile>
+

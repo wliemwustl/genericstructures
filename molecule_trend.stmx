@@ -1,0 +1,457 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xmile version="1.0" xmlns="http://docs.oasis-open.org/xmile/ns/XMILE/v1.0" xmlns:isee="http://iseesystems.com/XMILE">
+	<header>
+		<smile version="1.0" namespace="std, isee"/>
+		<name>molecule_trend</name>
+		<uuid>115be552-1da9-4271-b367-80d05e6ebb3b</uuid>
+		<vendor>isee systems, inc.</vendor>
+		<product version="1.4.2" isee:build_number="1203" isee:saved_by_v1="true" lang="en">Stella Architect</product>
+	</header>
+	<sim_specs isee:simulation_delay="0.0625" method="Euler" time_units="Year" isee:pause_after_rates="false" isee:instantaneous_flows="true">
+		<start>1</start>
+		<stop>24</stop>
+		<dt reciprocal="true">25</dt>
+	</sim_specs>
+	<isee:prefs show_module_prefix="true" live_update_on_drag="true" show_restore_buttons="false" layer="model" saved_runs="5" keep="false" rifp="true"/>
+	<isee:multiplayer_settings include_chat="true" allow_observers="false" advance_time_increment="1" observer_start_page="home_page" enabled="false"/>
+	<model_units>
+		<unit name="Years">
+			<eqn/>
+			<alias>yr</alias>
+			<alias>year</alias>
+		</unit>
+	</model_units>
+	<model>
+		<variables>
+			<group name="Generic" run="false">
+				<entity name="Historical_quantity"/>
+				<entity name="Change_in_Historical_Quantity"/>
+				<entity name="Perceived_Quantity"/>
+				<entity name="Change_in_perceived_quantity"/>
+				<entity name="Fractional_Trend"/>
+			</group>
+			<group name="Generic Parameters" run="false">
+				<entity name="INIT_Perceived_Quantity"/>
+				<entity name="INIT_Historical_Quantity"/>
+				<entity name="Duration_over_which_to_calculate_trend"/>
+				<entity name="Actual_Quantity"/>
+				<entity name="Time_to_Perceive"/>
+			</group>
+			<aux name="INIT Perceived\nQuantity">
+				<eqn>100</eqn>
+				<units>Quantity</units>
+			</aux>
+			<aux name="Time to Perceive">
+				<eqn>2</eqn>
+				<units>Years</units>
+			</aux>
+			<aux name="INIT Historical\nQuantity">
+				<eqn>100</eqn>
+				<units>Quantity</units>
+			</aux>
+			<group name="Adapted: Learning" run="false">
+				<entity name="Knowledge"/>
+				<entity name='"Historical_Knowledge_(?)"'/>
+				<entity name="Learning"/>
+				<entity name="Change_in_Historical_Knowledge"/>
+				<entity name="Fractional_Trend_Learning"/>
+			</group>
+			<group name="Learning Parameters" run="false">
+				<entity name="INIT_Knowledge"/>
+				<entity name="INIT_Historical_Knowledge"/>
+				<entity name="Things_to_Learn"/>
+				<entity name="Time_to_Learn"/>
+				<entity name="Duration_over_which_to_calculate_learning"/>
+			</group>
+			<stock name="Historical\nquantity">
+				<eqn>INIT_Historical_Quantity</eqn>
+				<inflow>Change_in_Historical_Quantity</inflow>
+				<non_negative/>
+				<units>Quantity</units>
+			</stock>
+			<flow name="Change in\nHistorical Quantity">
+				<eqn>(Perceived_Quantity-Historical_quantity)/Duration_over_which_to_calculate_trend</eqn>
+				<units>Quantity/Year</units>
+			</flow>
+			<aux name="Fractional Trend">
+				<eqn>(Perceived_Quantity-Historical_quantity)/(Historical_quantity*Duration_over_which_to_calculate_trend)</eqn>
+				<units>1/year</units>
+			</aux>
+			<stock name="Perceived\nQuantity">
+				<eqn>INIT_Perceived_Quantity</eqn>
+				<inflow>Change_in_perceived_quantity</inflow>
+				<non_negative/>
+				<units>Quantity</units>
+			</stock>
+			<flow name="Change in\nperceived quantity">
+				<eqn>(Actual_Quantity-Perceived_Quantity)/Time_to_Perceive</eqn>
+				<units>Quantity/Year</units>
+			</flow>
+			<aux name="Actual Quantity">
+				<eqn>150</eqn>
+				<units>Quantity</units>
+			</aux>
+			<aux name="Duration over which\nto calculate trend">
+				<eqn>10</eqn>
+				<units>Years</units>
+			</aux>
+			<stock name="Historical\nKnowledge (?)">
+				<eqn>INIT_Historical_Knowledge</eqn>
+				<inflow>Change_in_Historical_Knowledge</inflow>
+				<non_negative/>
+				<units>Knowledges</units>
+			</stock>
+			<aux name="Fractional Trend\nLearning">
+				<eqn>(Knowledge-&quot;Historical_Knowledge_(?)&quot;)/(&quot;Historical_Knowledge_(?)&quot;*Duration_over_which_to_calculate_learning)</eqn>
+				<units>1/year</units>
+			</aux>
+			<stock name="Knowledge">
+				<eqn>INIT_Knowledge</eqn>
+				<inflow>Learning</inflow>
+				<non_negative/>
+				<units>Knowledges</units>
+			</stock>
+			<flow name="Learning">
+				<eqn>(Things_to_Learn-Knowledge)/Time_to_Learn</eqn>
+				<non_negative/>
+				<units>Knowledges/Year</units>
+			</flow>
+			<flow name="Change in\nHistorical Knowledge">
+				<eqn>(Knowledge-&quot;Historical_Knowledge_(?)&quot;)/Duration_over_which_to_calculate_learning</eqn>
+				<non_negative/>
+				<units>Knowledges/Year</units>
+			</flow>
+			<aux name="INIT Knowledge">
+				<eqn>1</eqn>
+				<units>Knowledges</units>
+			</aux>
+			<aux name="Time to Learn">
+				<eqn>15</eqn>
+				<units>Years</units>
+			</aux>
+			<aux name="INIT Historical\nKnowledge">
+				<eqn>1</eqn>
+				<units>Knowledges</units>
+			</aux>
+			<aux name="Things to Learn">
+				<eqn>100</eqn>
+				<units>Knowledges</units>
+			</aux>
+			<aux name="Duration over which\nto calculate learning">
+				<eqn>10</eqn>
+				<units>Years</units>
+			</aux>
+			<isee:dependencies>
+				<var name="Historical_quantity">
+					<in>INIT_Historical_Quantity</in>
+				</var>
+				<var name="Change_in_Historical_Quantity">
+					<in>Historical_quantity</in>
+					<in>Perceived_Quantity</in>
+					<in>Duration_over_which_to_calculate_trend</in>
+				</var>
+				<var name="Fractional_Trend">
+					<in>Historical_quantity</in>
+					<in>Perceived_Quantity</in>
+					<in>Duration_over_which_to_calculate_trend</in>
+				</var>
+				<var name="Perceived_Quantity">
+					<in>INIT_Perceived_Quantity</in>
+				</var>
+				<var name="Change_in_perceived_quantity">
+					<in>Perceived_Quantity</in>
+					<in>Actual_Quantity</in>
+					<in>Time_to_Perceive</in>
+				</var>
+				<var name='"Historical_Knowledge_(?)"'>
+					<in>INIT_Historical_Knowledge</in>
+				</var>
+				<var name="Fractional_Trend_Learning">
+					<in>&quot;Historical_Knowledge_(?)&quot;</in>
+					<in>Knowledge</in>
+					<in>Duration_over_which_to_calculate_learning</in>
+				</var>
+				<var name="Knowledge">
+					<in>INIT_Knowledge</in>
+				</var>
+				<var name="Learning">
+					<in>Knowledge</in>
+					<in>Things_to_Learn</in>
+					<in>Time_to_Learn</in>
+				</var>
+				<var name="Change_in_Historical_Knowledge">
+					<in>Knowledge</in>
+					<in>&quot;Historical_Knowledge_(?)&quot;</in>
+					<in>Duration_over_which_to_calculate_learning</in>
+				</var>
+			</isee:dependencies>
+		</variables>
+		<views>
+			<style color="black" background="white" font_style="normal" font_weight="normal" text_decoration="none" text_align="center" vertical_text_align="center" font_color="black" font_family="Arial" font_size="10pt" padding="2" border_color="black" border_width="thin" border_style="none">
+				<text_box color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+				<isee:loop_indicator color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+				<numeric_display color="blue" background="white" font_size="9pt" isee:transparent="false"/>
+				<graph color="black" background="white" font_size="12pt" axis_color="#666666" grid_color="#C8C8C8" isee:graph_area_color="white" legend_position="bottom" isee:transparent="false" isee:hide_border="false">
+					<isee:series_styles>
+						<isee:series_style color="blue" thickness="1"/>
+						<isee:series_style color="red" thickness="1" pen_style="dot_dashed"/>
+						<isee:series_style color="fuchsia" thickness="1" pen_style="dotted"/>
+						<isee:series_style color="#008F44" thickness="1" pen_style="dashed"/>
+						<isee:series_style color="#FF7F00" thickness="1"/>
+						<isee:series_style color="#7F00FF" thickness="1" pen_style="dot_dashed"/>
+						<isee:series_style color="#0CA0FF" thickness="1" pen_style="dotted"/>
+						<isee:series_style color="lime" thickness="1" pen_style="dashed"/>
+						<isee:series_style color="#FF007F" thickness="1"/>
+						<isee:series_style color="aqua" thickness="1" pen_style="dot_dashed"/>
+						<isee:series_style color="#F586FF" thickness="1" pen_style="dotted"/>
+						<isee:series_style color="black" thickness="1" pen_style="dashed"/>
+						<isee:series_style color="#C8C8C8" thickness="1"/>
+					</isee:series_styles>
+				</graph>
+				<table color="black" background="#E0E0E0" text_align="right" font_size="12pt" orientation="vertical" wrap_text="false" isee:auto_fit="true" isee:use_alternate_row_colors="false" isee:unlimited_table_length="false" blank_column_width="80" column_width="160" isee:report_month_names="false" interval="1" report_balances="beginning" report_flows="instantaneous"/>
+				<button color="black" background="#E0E0E0" font_size="12pt" transparent="false" corner_radius="0" isee:flat="false" icon_side="top"/>
+				<isee:annotation color="black" background="#E0E0E0" font_size="12pt" transparent="false" corner_radius="0" isee:flat="false" icon_side="top" popup_background_color="#FFFECF"/>
+				<slider color="black" background="#E0E0E0" font_size="12pt" num_ticks="3" label_side="top" wrap_title="true" isee:always_show_hover_tip="false" input_expands="true" input_width="100"/>
+				<isee:pie_input color="black" background="white" font_size="12pt" legend_position="bottom" isee:transparent="false"/>
+				<knob color="#66CC66" background="#E0E0E0" font_size="12pt" label_side="bottom" wrap_title="true"/>
+				<numeric_input color="black" background="#E0E0E0" font_size="12pt" label_side="left" wrap_title="true" input_expands="false" input_width="100"/>
+				<switch color="black" background="#E0E0E0" font_size="12pt" label_side="top" wrap_title="true" isee:appearance="switch"/>
+				<options color="black" background="white" appearance="radio-buttons" arrangement="vertical"/>
+				<graphical_input color="black" background="#E0E0E0" font_size="12pt"/>
+				<group_input color="black" background="#E0E0E0" font_size="12pt"/>
+				<lamp color="black" background="white" font_size="9pt"/>
+				<gauge color="black" background="white" font_size="9pt" needle_color="#F09F72" bar_color="#EEEEEE" bar_progress_color="black" appearance="radial" num_major_ticks="11" num_minor_ticks="11" show_numeric_value="true"/>
+				<isee:spatial_map color="black" background="white" font_size="12pt"/>
+				<isee:animation_object color="black" background="white" font_size="12pt"/>
+			</style>
+			<view isee:show_pages="false" page_width="764" page_height="584" isee:page_cols="2" isee:page_rows="2" isee:scroll_y="50" isee:popup_graphs_are_comparative="true" type="stock_flow">
+				<style color="black" background="white" font_style="normal" font_weight="normal" text_decoration="none" text_align="center" vertical_text_align="center" font_color="black" font_family="Arial" font_size="10pt" padding="2" border_color="black" border_width="thin" border_style="none">
+					<stock color="blue" background="white" font_color="blue" font_size="12pt" label_side="top">
+						<shape type="rectangle" width="45" height="35"/>
+					</stock>
+					<flow color="blue" background="white" font_color="blue" font_size="12pt" label_side="bottom"/>
+					<module color="blue" background="white" font_color="blue" font_size="12pt" label_side="top">
+						<shape type="rectangle" width="55" height="45"/>
+					</module>
+					<aux color="blue" background="white" font_color="blue" font_size="12pt" label_side="bottom">
+						<shape type="circle" radius="18"/>
+					</aux>
+					<group color="red" background="white" font_color="red" font_size="9pt"/>
+					<connector color="#FF007F" background="white" font_color="#FF007F" font_size="9pt" isee:thickness="1"/>
+					<text_box color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+					<isee:loop_indicator color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+					<numeric_display color="blue" background="white" font_size="9pt" isee:transparent="false"/>
+					<graph color="black" background="white" font_size="12pt" axis_color="#666666" grid_color="#C8C8C8" isee:graph_area_color="white" legend_position="bottom" isee:transparent="false" isee:hide_border="false">
+						<isee:series_styles>
+							<isee:series_style color="blue" thickness="1"/>
+							<isee:series_style color="red" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="fuchsia" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="#008F44" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#FF7F00" thickness="1"/>
+							<isee:series_style color="#7F00FF" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="#0CA0FF" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="lime" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#FF007F" thickness="1"/>
+							<isee:series_style color="aqua" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="#F586FF" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="black" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#C8C8C8" thickness="1"/>
+						</isee:series_styles>
+					</graph>
+					<table color="black" background="#E0E0E0" text_align="right" font_size="12pt" orientation="vertical" wrap_text="false" isee:auto_fit="true" isee:use_alternate_row_colors="false" isee:unlimited_table_length="false" blank_column_width="80" column_width="160" isee:report_month_names="false" interval="1" report_balances="beginning" report_flows="instantaneous"/>
+				</style>
+				<stacked_container uid="1" x="949" y="179">
+					<graph x="774" y="54" width="350" height="250" type="time_series" show_grid="false" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="5" num_y_labels="3" title="Graph" isee:stacked_area_alpha="0.1" left_axis_multi_scale="false" left_axis_auto_scale="true" right_axis_multi_scale="false" right_axis_auto_scale="true">
+						<plot color="blue" isee:keep_zero_visible="true" pen_width="1" index="0" right_axis="true" show_y_axis="true">
+							<entity name="Fractional_Trend"/>
+						</plot>
+						<plot color="red" pen_style="dot_dashed" pen_width="1" index="0" show_y_axis="true">
+							<entity name="Historical_quantity"/>
+						</plot>
+						<plot color="fuchsia" pen_style="dotted" isee:keep_zero_visible="true" pen_width="1" index="1" show_y_axis="true">
+							<entity name="Perceived_Quantity"/>
+						</plot>
+					</graph>
+				</stacked_container>
+				<group locked="false" x="58" y="68" width="535" height="365" name="Generic">
+					<item uid="2"/>
+					<item uid="3"/>
+					<item uid="4"/>
+				</group>
+				<text_box uid="5" x="777" y="312" width="260" height="103">Source - Jim Hines. 2005. Molecules of Structure: Building Blocks for system dynamics models. 
+</text_box>
+				<group locked="false" x="594" y="68" width="173" height="366" name="Generic Parameters"/>
+				<aux label_side="right" x="631" y="106" name="INIT Perceived\nQuantity"/>
+				<aux label_side="right" x="631" y="230" name="Time to Perceive"/>
+				<aux label_side="right" x="631" y="152" name="INIT Historical\nQuantity"/>
+				<group locked="false" x="58" y="457" width="535" height="384" name="Adapted: Learning">
+					<item uid="6"/>
+					<item uid="7"/>
+					<item uid="8"/>
+				</group>
+				<group locked="false" x="594" y="457" width="173" height="384" name="Learning Parameters"/>
+				<stacked_container uid="9" x="949" y="564">
+					<graph x="774" y="439" width="350" height="250" type="time_series" show_grid="false" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="5" num_y_labels="3" title="Graph" isee:stacked_area_alpha="0.1" left_axis_multi_scale="false" left_axis_auto_scale="true" right_axis_multi_scale="false" right_axis_auto_scale="true">
+						<plot color="blue" pen_width="1" index="0" show_y_axis="true">
+							<entity name="Things_to_Learn"/>
+						</plot>
+						<plot color="red" pen_style="dot_dashed" isee:keep_zero_visible="true" pen_width="1" index="1" show_y_axis="true">
+							<entity name="Knowledge"/>
+						</plot>
+						<plot color="fuchsia" pen_style="dotted" pen_width="1" index="2" show_y_axis="true">
+							<entity name='"Historical_Knowledge_(?)"'/>
+						</plot>
+						<plot color="#008F44" pen_style="dashed" isee:keep_zero_visible="true" pen_width="1" index="0" right_axis="true" show_y_axis="true">
+							<entity name="Fractional_Trend_Learning"/>
+						</plot>
+					</graph>
+				</stacked_container>
+				<stock label_side="center" x="296.5" y="267.5" width="78" height="55" name="Historical\nquantity"/>
+				<flow x="253.25" y="293" name="Change in\nHistorical Quantity">
+					<pts>
+						<pt x="198" y="293"/>
+						<pt x="296.5" y="293"/>
+					</pts>
+				</flow>
+				<aux x="450" y="248" name="Fractional Trend"/>
+				<stock label_side="center" x="247.5" y="165" width="71" height="48" name="Perceived\nQuantity"/>
+				<flow x="209.75" y="189" name="Change in\nperceived quantity">
+					<pts>
+						<pt x="160" y="189"/>
+						<pt x="247.5" y="189"/>
+					</pts>
+				</flow>
+				<aux label_side="right" x="631" y="185" name="Actual Quantity"/>
+				<connector uid="10" angle="149.265">
+					<from>Perceived_Quantity</from>
+					<to>Change_in_perceived_quantity</to>
+				</connector>
+				<connector uid="11" angle="206.131">
+					<from>Historical_quantity</from>
+					<to>Change_in_Historical_Quantity</to>
+				</connector>
+				<aux label_side="right" x="634" y="276" name="Duration over which\nto calculate trend"/>
+				<connector uid="12" angle="9.97206">
+					<from>Historical_quantity</from>
+					<to>Fractional_Trend</to>
+				</connector>
+				<connector uid="13" angle="317.42">
+					<from>Perceived_Quantity</from>
+					<to>Fractional_Trend</to>
+				</connector>
+				<connector uid="14" angle="239.744">
+					<from>Perceived_Quantity</from>
+					<to>Change_in_Historical_Quantity</to>
+				</connector>
+				<alias color="blue" background="white" font_style="italic" uid="2" x="145" y="108" width="18" height="18">
+					<shape type="circle" radius="18"/>
+					<of>Actual_Quantity</of>
+				</alias>
+				<connector uid="15" angle="305.538">
+					<from>
+						<alias uid="2"/>
+					</from>
+					<to>Change_in_perceived_quantity</to>
+				</connector>
+				<alias font_style="italic" uid="3" x="251" y="99" width="18" height="18">
+					<of>Time_to_Perceive</of>
+				</alias>
+				<connector uid="16" angle="229.268">
+					<from>
+						<alias uid="3"/>
+					</from>
+					<to>Change_in_perceived_quantity</to>
+				</connector>
+				<alias font_style="italic" label_side="bottom" uid="4" x="342" y="360" width="18" height="18">
+					<of>Duration_over_which_to_calculate_trend</of>
+				</alias>
+				<connector uid="17" angle="180">
+					<from>
+						<alias uid="4"/>
+					</from>
+					<to>Change_in_Historical_Quantity</to>
+				</connector>
+				<connector uid="18" angle="17.1027">
+					<from>
+						<alias uid="4"/>
+					</from>
+					<to>Fractional_Trend</to>
+				</connector>
+				<stock label_side="center" x="321.5" y="656.5" width="78" height="55" name="Historical\nKnowledge (?)"/>
+				<aux x="475" y="637" name="Fractional Trend\nLearning"/>
+				<stock label_side="center" x="272.5" y="554" width="71" height="48" name="Knowledge"/>
+				<connector uid="19" angle="9.97206">
+					<from>&quot;Historical_Knowledge_(?)&quot;</from>
+					<to>Fractional_Trend_Learning</to>
+				</connector>
+				<connector uid="20" angle="317.42">
+					<from>Knowledge</from>
+					<to>Fractional_Trend_Learning</to>
+				</connector>
+				<flow x="227.75" y="576" name="Learning">
+					<pts>
+						<pt x="183" y="576"/>
+						<pt x="272.5" y="576"/>
+					</pts>
+				</flow>
+				<flow x="277.75" y="684" name="Change in\nHistorical Knowledge">
+					<pts>
+						<pt x="234" y="684"/>
+						<pt x="321.5" y="684"/>
+					</pts>
+				</flow>
+				<connector uid="21" angle="235.305">
+					<from>Knowledge</from>
+					<to>Change_in_Historical_Knowledge</to>
+				</connector>
+				<connector uid="22" angle="142.595">
+					<from>Knowledge</from>
+					<to>Learning</to>
+				</connector>
+				<connector uid="23" angle="152.003">
+					<from>&quot;Historical_Knowledge_(?)&quot;</from>
+					<to>Change_in_Historical_Knowledge</to>
+				</connector>
+				<aux label_side="right" x="632" y="509" name="INIT Knowledge"/>
+				<aux label_side="right" x="632" y="633" name="Time to Learn"/>
+				<aux label_side="right" x="632" y="555" name="INIT Historical\nKnowledge"/>
+				<aux label_side="right" x="632" y="588" name="Things to Learn"/>
+				<aux label_side="right" x="632" y="679" name="Duration over which\nto calculate learning"/>
+				<alias font_style="italic" uid="6" x="171.75" y="500" width="18" height="18">
+					<of>Things_to_Learn</of>
+				</alias>
+				<connector uid="24" angle="305.049">
+					<from>
+						<alias uid="6"/>
+					</from>
+					<to>Learning</to>
+				</connector>
+				<alias font_style="italic" uid="7" x="266" y="490" width="18" height="18">
+					<of>Time_to_Learn</of>
+				</alias>
+				<connector uid="25" angle="235.923">
+					<from>
+						<alias uid="7"/>
+					</from>
+					<to>Learning</to>
+				</connector>
+				<alias font_style="italic" uid="8" x="388" y="755" width="18" height="18">
+					<of>Duration_over_which_to_calculate_learning</of>
+				</alias>
+				<connector uid="26" angle="188.746">
+					<from>
+						<alias uid="8"/>
+					</from>
+					<to>Change_in_Historical_Knowledge</to>
+				</connector>
+				<connector uid="27" angle="29.7449">
+					<from>
+						<alias uid="8"/>
+					</from>
+					<to>Fractional_Trend_Learning</to>
+				</connector>
+			</view>
+		</views>
+	</model>
+</xmile>
+

@@ -1,0 +1,585 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xmile version="1.0" xmlns="http://docs.oasis-open.org/xmile/ns/XMILE/v1.0" xmlns:isee="http://iseesystems.com/XMILE">
+	<header>
+		<smile version="1.0" namespace="std, isee"/>
+		<name>molecule_rework</name>
+		<uuid>115be552-1da9-4271-b367-80d05e6ebb3b</uuid>
+		<vendor>isee systems, inc.</vendor>
+		<product version="1.4.2" isee:build_number="1203" isee:saved_by_v1="true" lang="en">Stella Architect</product>
+	</header>
+	<sim_specs isee:simulation_delay="0.0416667" method="Euler" time_units="Weeks" isee:pause_after_rates="false" isee:instantaneous_flows="true">
+		<start>1</start>
+		<stop>36</stop>
+		<dt reciprocal="true">25</dt>
+	</sim_specs>
+	<isee:prefs show_module_prefix="true" live_update_on_drag="true" show_restore_buttons="false" layer="model" saved_runs="5" keep="false" rifp="true"/>
+	<isee:multiplayer_settings include_chat="true" allow_observers="false" advance_time_increment="1" observer_start_page="home_page" enabled="false"/>
+	<model_units>
+		<unit name="Dimensionless">
+			<eqn>1</eqn>
+			<alias>dmnl</alias>
+			<alias>unitless</alias>
+		</unit>
+		<unit name="Weeks">
+			<eqn/>
+			<alias>wk</alias>
+			<alias>week</alias>
+		</unit>
+	</model_units>
+	<model>
+		<variables>
+			<group name="Generic" run="false">
+				<entity name="Work_to_Do"/>
+				<entity name="Accomplishing_Work"/>
+				<entity name="Discovering_Rework"/>
+				<entity name="Accomplishing_incorrectly"/>
+				<entity name="Accomplishing_Correctly"/>
+				<entity name="FR_accomplishing_work"/>
+				<entity name="Undiscovered_Rework"/>
+				<entity name="Correct_Work"/>
+				<entity name="Data_Entry_Quality"/>
+				<entity name="AT_discovering_Errors"/>
+				<entity name="INIT_Work_to_Do"/>
+				<entity name="INIT_Correct_work"/>
+				<entity name="INIT_Undiscovered_Rework"/>
+			</group>
+			<group name="Adapted: Data entry" run="false">
+				<entity name="Data_to_Enter"/>
+				<entity name="Entering_Data"/>
+				<entity name="Discovering_Errors"/>
+				<entity name="FR_Entering_Data"/>
+				<entity name="Collecting_Data"/>
+				<entity name="FR_Collecting_Data"/>
+				<entity name="Interview_Backlog"/>
+				<entity name="Undiscovered_Dirty_Data"/>
+				<entity name="Clean_Entries"/>
+				<entity name="Entering_with_Errors"/>
+				<entity name="Entering_without_Errors"/>
+				<entity name="AT_Discover_Errors"/>
+				<entity name="INIT_Data_to_Enter"/>
+				<entity name="INIT_Clean_Interviews"/>
+				<entity name="INIT_Undiscovered_Dirty_Data"/>
+				<entity name="INIT_Interviews_to_complete"/>
+				<entity name="Data_Entry_Quality_1"/>
+				<entity name="Ref_Mode"/>
+			</group>
+			<stock name="Work to Do">
+				<eqn>INIT_Work_to_Do</eqn>
+				<inflow>Discovering_Rework</inflow>
+				<outflow>Accomplishing_Work</outflow>
+				<non_negative/>
+				<units>Works</units>
+			</stock>
+			<stock name="Undiscovered Rework">
+				<eqn>INIT_Undiscovered_Rework</eqn>
+				<inflow>Accomplishing_incorrectly</inflow>
+				<outflow>Discovering_Rework</outflow>
+				<non_negative/>
+				<units>Works</units>
+			</stock>
+			<stock name="Correct Work">
+				<eqn>INIT_Correct_work</eqn>
+				<inflow>Accomplishing_Correctly</inflow>
+				<non_negative/>
+				<units>Works</units>
+			</stock>
+			<flow name="Accomplishing\nWork">
+				<eqn>Work_to_Do*FR_accomplishing_work</eqn>
+				<non_negative/>
+				<units>Works/Weeks</units>
+			</flow>
+			<flow name="Discovering Rework">
+				<eqn>Undiscovered_Rework/AT_discovering_Errors</eqn>
+				<non_negative/>
+				<units>Works/Weeks</units>
+			</flow>
+			<flow name="Accomplishing\nincorrectly">
+				<eqn>Accomplishing_Work*(1-Data_Entry_Quality)</eqn>
+				<non_negative/>
+				<units>Works/Weeks</units>
+			</flow>
+			<flow name="Accomplishing\nCorrectly">
+				<eqn>Accomplishing_Work*Data_Entry_Quality</eqn>
+				<non_negative/>
+				<units>Works/Weeks</units>
+			</flow>
+			<aux name="FR accomplishing\nwork">
+				<eqn>.1</eqn>
+				<units>1/week</units>
+			</aux>
+			<stock name="Data to\nEnter">
+				<eqn>INIT_Data_to_Enter</eqn>
+				<inflow>Discovering_Errors</inflow>
+				<inflow>Collecting_Data</inflow>
+				<outflow>Entering_Data</outflow>
+				<non_negative/>
+				<units>Interviews</units>
+			</stock>
+			<stock name="Undiscovered\nDirty Data">
+				<eqn>INIT_Undiscovered_Dirty_Data</eqn>
+				<inflow>Entering_with_Errors</inflow>
+				<outflow>Discovering_Errors</outflow>
+				<non_negative/>
+				<units>Interviews</units>
+			</stock>
+			<stock name="Clean\nEntries">
+				<eqn>INIT_Clean_Interviews</eqn>
+				<inflow>Entering_without_Errors</inflow>
+				<non_negative/>
+				<units>Interviews</units>
+			</stock>
+			<flow name="Entering Data">
+				<eqn>Data_to_Enter*FR_Entering_Data</eqn>
+				<non_negative/>
+				<units>Interviews/Weeks</units>
+			</flow>
+			<flow name="Discovering Errors">
+				<eqn>Undiscovered_Dirty_Data/AT_Discover_Errors</eqn>
+				<non_negative/>
+				<units>Interviews/Weeks</units>
+			</flow>
+			<flow name="Entering with\nErrors">
+				<eqn>Entering_Data*(1-Data_Entry_Quality_1)</eqn>
+				<non_negative/>
+				<units>Interviews/Weeks</units>
+			</flow>
+			<flow name="Entering without\nErrors">
+				<eqn>Entering_Data*Data_Entry_Quality_1</eqn>
+				<non_negative/>
+				<units>Interviews/Weeks</units>
+			</flow>
+			<aux name="FR Entering Data">
+				<eqn>.1</eqn>
+				<units>1/week</units>
+			</aux>
+			<flow name="Collecting Data">
+				<eqn>Interview_Backlog*FR_Collecting_Data</eqn>
+				<non_negative/>
+				<units>Interviews/Weeks</units>
+			</flow>
+			<aux name="FR Collecting Data">
+				<eqn>.1</eqn>
+				<units>1/weeks</units>
+			</aux>
+			<aux name="Data Entry\nQuality">
+				<eqn>.5</eqn>
+				<units>dmnl</units>
+			</aux>
+			<aux name="AT discovering Errors">
+				<eqn>20</eqn>
+				<units>Weeks</units>
+			</aux>
+			<aux name="INIT Work to Do">
+				<eqn>100</eqn>
+				<units>Works</units>
+			</aux>
+			<aux name="INIT Correct work">
+				<eqn>0</eqn>
+				<units>Works</units>
+			</aux>
+			<aux name="INIT Undiscovered\nRework">
+				<eqn>0</eqn>
+				<units>Works</units>
+			</aux>
+			<aux name="Data Entry\nQuality 1">
+				<eqn>.5</eqn>
+				<units>dmnl</units>
+			</aux>
+			<aux name="AT Discover Errors">
+				<eqn>20</eqn>
+				<units>Weeks</units>
+			</aux>
+			<aux name="INIT Data to Enter">
+				<eqn>100</eqn>
+				<units>Interviews</units>
+			</aux>
+			<aux name="INIT Clean Interviews">
+				<eqn>0</eqn>
+				<units>Interviews</units>
+			</aux>
+			<aux name="INIT Undiscovered\nDirty Data">
+				<eqn>0</eqn>
+				<units>Interviews</units>
+			</aux>
+			<stock name="Interview\nBacklog">
+				<eqn>INIT_Interviews_to_complete</eqn>
+				<outflow>Collecting_Data</outflow>
+				<non_negative/>
+				<units>Interviews</units>
+			</stock>
+			<aux name="INIT Interviews\nto complete">
+				<eqn>1000</eqn>
+				<units>Interviews</units>
+			</aux>
+			<aux name="Ref Mode">
+				<eqn>TIME</eqn>
+				<gf>
+					<xscale min="1" max="36"/>
+					<yscale min="0" max="1000"/>
+					<ypts>0,1000</ypts>
+				</gf>
+				<units>dmnl</units>
+			</aux>
+			<isee:dependencies>
+				<var name="Work_to_Do">
+					<in>INIT_Work_to_Do</in>
+				</var>
+				<var name="Undiscovered_Rework">
+					<in>INIT_Undiscovered_Rework</in>
+				</var>
+				<var name="Correct_Work">
+					<in>INIT_Correct_work</in>
+				</var>
+				<var name="Accomplishing_Work">
+					<in>Work_to_Do</in>
+					<in>FR_accomplishing_work</in>
+				</var>
+				<var name="Discovering_Rework">
+					<in>Undiscovered_Rework</in>
+					<in>AT_discovering_Errors</in>
+				</var>
+				<var name="Accomplishing_incorrectly">
+					<in>Accomplishing_Work</in>
+					<in>Data_Entry_Quality</in>
+				</var>
+				<var name="Accomplishing_Correctly">
+					<in>Accomplishing_Work</in>
+					<in>Data_Entry_Quality</in>
+				</var>
+				<var name="Data_to_Enter">
+					<in>INIT_Data_to_Enter</in>
+				</var>
+				<var name="Undiscovered_Dirty_Data">
+					<in>INIT_Undiscovered_Dirty_Data</in>
+				</var>
+				<var name="Clean_Entries">
+					<in>INIT_Clean_Interviews</in>
+				</var>
+				<var name="Entering_Data">
+					<in>Data_to_Enter</in>
+					<in>FR_Entering_Data</in>
+				</var>
+				<var name="Discovering_Errors">
+					<in>Undiscovered_Dirty_Data</in>
+					<in>AT_Discover_Errors</in>
+				</var>
+				<var name="Entering_with_Errors">
+					<in>Entering_Data</in>
+					<in>Data_Entry_Quality_1</in>
+				</var>
+				<var name="Entering_without_Errors">
+					<in>Entering_Data</in>
+					<in>Data_Entry_Quality_1</in>
+				</var>
+				<var name="Collecting_Data">
+					<in>FR_Collecting_Data</in>
+					<in>Interview_Backlog</in>
+				</var>
+				<var name="Interview_Backlog">
+					<in>INIT_Interviews_to_complete</in>
+				</var>
+			</isee:dependencies>
+		</variables>
+		<views>
+			<style color="black" background="white" font_style="normal" font_weight="normal" text_decoration="none" text_align="center" vertical_text_align="center" font_color="black" font_family="Arial" font_size="10pt" padding="2" border_color="black" border_width="thin" border_style="none">
+				<text_box color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+				<isee:loop_indicator color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+				<numeric_display color="blue" background="white" font_size="9pt" isee:transparent="false"/>
+				<graph color="black" background="white" font_size="12pt" axis_color="#666666" grid_color="#C8C8C8" isee:graph_area_color="white" legend_position="bottom" isee:transparent="false" isee:hide_border="false">
+					<isee:series_styles>
+						<isee:series_style color="blue" thickness="1"/>
+						<isee:series_style color="red" thickness="1" pen_style="dot_dashed"/>
+						<isee:series_style color="fuchsia" thickness="1" pen_style="dotted"/>
+						<isee:series_style color="#008F44" thickness="1" pen_style="dashed"/>
+						<isee:series_style color="#FF7F00" thickness="1"/>
+						<isee:series_style color="#7F00FF" thickness="1" pen_style="dot_dashed"/>
+						<isee:series_style color="#0CA0FF" thickness="1" pen_style="dotted"/>
+						<isee:series_style color="lime" thickness="1" pen_style="dashed"/>
+						<isee:series_style color="#FF007F" thickness="1"/>
+						<isee:series_style color="aqua" thickness="1" pen_style="dot_dashed"/>
+						<isee:series_style color="#F586FF" thickness="1" pen_style="dotted"/>
+						<isee:series_style color="black" thickness="1" pen_style="dashed"/>
+						<isee:series_style color="#C8C8C8" thickness="1"/>
+					</isee:series_styles>
+				</graph>
+				<table color="black" background="#E0E0E0" text_align="right" font_size="12pt" orientation="vertical" wrap_text="false" isee:auto_fit="true" isee:use_alternate_row_colors="false" isee:unlimited_table_length="false" blank_column_width="80" column_width="160" isee:report_month_names="false" interval="1" report_balances="beginning" report_flows="instantaneous"/>
+				<button color="black" background="#E0E0E0" font_size="12pt" transparent="false" corner_radius="0" isee:flat="false" icon_side="top"/>
+				<isee:annotation color="black" background="#E0E0E0" font_size="12pt" transparent="false" corner_radius="0" isee:flat="false" icon_side="top" popup_background_color="#FFFECF"/>
+				<slider color="black" background="#E0E0E0" font_size="12pt" num_ticks="3" label_side="top" wrap_title="true" isee:always_show_hover_tip="false" input_expands="true" input_width="100"/>
+				<isee:pie_input color="black" background="white" font_size="12pt" legend_position="bottom" isee:transparent="false"/>
+				<knob color="#66CC66" background="#E0E0E0" font_size="12pt" label_side="bottom" wrap_title="true"/>
+				<numeric_input color="black" background="#E0E0E0" font_size="12pt" label_side="left" wrap_title="true" input_expands="false" input_width="100"/>
+				<switch color="black" background="#E0E0E0" font_size="12pt" label_side="top" wrap_title="true" isee:appearance="switch"/>
+				<options color="black" background="white" appearance="radio-buttons" arrangement="vertical"/>
+				<graphical_input color="black" background="#E0E0E0" font_size="12pt"/>
+				<group_input color="black" background="#E0E0E0" font_size="12pt"/>
+				<lamp color="black" background="white" font_size="9pt"/>
+				<gauge color="black" background="white" font_size="9pt" needle_color="#F09F72" bar_color="#EEEEEE" bar_progress_color="black" appearance="radial" num_major_ticks="11" num_minor_ticks="11" show_numeric_value="true"/>
+				<isee:spatial_map color="black" background="white" font_size="12pt"/>
+				<isee:animation_object color="black" background="white" font_size="12pt"/>
+			</style>
+			<view isee:show_pages="false" page_width="764" page_height="584" isee:page_cols="2" isee:page_rows="2" isee:scroll_y="8" isee:popup_graphs_are_comparative="true" type="stock_flow">
+				<style color="black" background="white" font_style="normal" font_weight="normal" text_decoration="none" text_align="center" vertical_text_align="center" font_color="black" font_family="Arial" font_size="10pt" padding="2" border_color="black" border_width="thin" border_style="none">
+					<stock color="blue" background="white" font_color="blue" font_size="12pt" label_side="top">
+						<shape type="rectangle" width="45" height="35"/>
+					</stock>
+					<flow color="blue" background="white" font_color="blue" font_size="12pt" label_side="bottom"/>
+					<module color="blue" background="white" font_color="blue" font_size="12pt" label_side="top">
+						<shape type="rectangle" width="55" height="45"/>
+					</module>
+					<aux color="blue" background="white" font_color="blue" font_size="12pt" label_side="bottom">
+						<shape type="circle" radius="18"/>
+					</aux>
+					<group color="red" background="white" font_color="red" font_size="9pt"/>
+					<connector color="#FF007F" background="white" font_color="#FF007F" font_size="9pt" isee:thickness="1"/>
+					<text_box color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+					<isee:loop_indicator color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+					<numeric_display color="blue" background="white" font_size="9pt" isee:transparent="false"/>
+					<graph color="black" background="white" font_size="12pt" axis_color="#666666" grid_color="#C8C8C8" isee:graph_area_color="white" legend_position="bottom" isee:transparent="false" isee:hide_border="false">
+						<isee:series_styles>
+							<isee:series_style color="blue" thickness="1"/>
+							<isee:series_style color="red" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="fuchsia" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="#008F44" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#FF7F00" thickness="1"/>
+							<isee:series_style color="#7F00FF" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="#0CA0FF" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="lime" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#FF007F" thickness="1"/>
+							<isee:series_style color="aqua" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="#F586FF" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="black" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#C8C8C8" thickness="1"/>
+						</isee:series_styles>
+					</graph>
+					<table color="black" background="#E0E0E0" text_align="right" font_size="12pt" orientation="vertical" wrap_text="false" isee:auto_fit="true" isee:use_alternate_row_colors="false" isee:unlimited_table_length="false" blank_column_width="80" column_width="160" isee:report_month_names="false" interval="1" report_balances="beginning" report_flows="instantaneous"/>
+				</style>
+				<stacked_container uid="1" x="774" y="54" width="350" height="301">
+					<graph x="774" y="54" width="350" height="301" type="time_series" show_grid="false" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="5" num_y_labels="3" title="Graph" isee:stacked_area_alpha="0.1" left_axis_multi_scale="false" left_axis_auto_scale="true" right_axis_multi_scale="false" right_axis_auto_scale="true">
+						<plot color="blue" pen_width="1" index="0" show_y_axis="true">
+							<entity name="Work_to_Do"/>
+						</plot>
+						<plot color="red" pen_style="dot_dashed" pen_width="1" index="1" show_y_axis="true">
+							<entity name="Correct_Work"/>
+						</plot>
+						<plot color="fuchsia" pen_style="dotted" pen_width="1" index="2" show_y_axis="true">
+							<entity name="Undiscovered_Rework"/>
+						</plot>
+					</graph>
+				</stacked_container>
+				<group locked="false" x="58" y="68" width="693" height="365" name="Generic">
+					<item uid="2"/>
+					<item uid="3"/>
+				</group>
+				<text_box uid="4" x="777" y="364" width="260" height="76">Source - Jim Hines. 2005. Molecules of Structure: Building Blocks for system dynamics models. 
+
+Need to revise accomplishing work equation
+</text_box>
+				<group locked="false" x="58" y="457" width="695" height="384" name="Adapted: Data entry">
+					<item uid="5"/>
+					<item uid="6"/>
+				</group>
+				<stacked_container uid="7" x="774" y="439" width="350" height="310">
+					<graph x="774" y="439" width="350" height="310" type="time_series" show_grid="false" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="5" num_y_labels="3" title="Graph" isee:stacked_area_alpha="0.1" left_axis_multi_scale="false" left_axis_auto_scale="true" right_axis_multi_scale="false" right_axis_auto_scale="true">
+						<plot color="#008F44" pen_style="dashed" pen_width="1" index="0" show_y_axis="true">
+							<entity name="Interview_Backlog"/>
+						</plot>
+						<plot color="red" pen_style="dot_dashed" pen_width="1" index="1" show_y_axis="true">
+							<entity name="Data_to_Enter"/>
+						</plot>
+						<plot color="blue" pen_width="1" index="2" show_y_axis="true">
+							<entity name="Clean_Entries"/>
+						</plot>
+						<plot color="#008F44" pen_style="dashed" pen_width="1" index="3" show_y_axis="true">
+							<entity name="Undiscovered_Dirty_Data"/>
+						</plot>
+						<plot color="#FF7F00" pen_width="1" index="4" show_y_axis="true">
+							<entity name="Ref_Mode"/>
+						</plot>
+					</graph>
+				</stacked_container>
+				<stock x="152.5" y="172.5" width="68" height="45" name="Work to Do"/>
+				<stock x="382.5" y="262.5" width="66" height="39" name="Undiscovered Rework"/>
+				<stock x="382.5" y="94.5" width="66" height="38" name="Correct Work"/>
+				<flow x="255.25" y="196" name="Accomplishing\nWork">
+					<pts>
+						<pt x="220.5" y="196"/>
+						<pt x="314" y="196"/>
+					</pts>
+				</flow>
+				<flow x="298.5" y="353" name="Discovering Rework">
+					<pts>
+						<pt x="414" y="301.5"/>
+						<pt x="414" y="353"/>
+						<pt x="183" y="353"/>
+						<pt x="183" y="217.5"/>
+					</pts>
+				</flow>
+				<flow x="343.75" y="282" name="Accomplishing\nincorrectly">
+					<pts>
+						<pt x="305" y="282"/>
+						<pt x="382.5" y="282"/>
+					</pts>
+				</flow>
+				<flow x="343.75" y="108" name="Accomplishing\nCorrectly">
+					<pts>
+						<pt x="305" y="108"/>
+						<pt x="382.5" y="108"/>
+					</pts>
+				</flow>
+				<connector uid="8" angle="81.4692">
+					<from>Accomplishing_Work</from>
+					<to>Accomplishing_Correctly</to>
+				</connector>
+				<connector uid="9" angle="272.862">
+					<from>Accomplishing_Work</from>
+					<to>Accomplishing_incorrectly</to>
+				</connector>
+				<connector uid="10" angle="237.465">
+					<from>Undiscovered_Rework</from>
+					<to>Discovering_Rework</to>
+				</connector>
+				<connector uid="11" angle="43.0251">
+					<from>Work_to_Do</from>
+					<to>Accomplishing_Work</to>
+				</connector>
+				<aux x="229.5" y="108" name="FR accomplishing\nwork"/>
+				<connector uid="12" angle="302.535">
+					<from>FR_accomplishing_work</from>
+					<to>Accomplishing_Work</to>
+				</connector>
+				<stock label_side="center" x="228.5" y="561.5" width="68" height="45" name="Data to\nEnter"/>
+				<stock label_side="center" x="458.5" y="651.5" width="66" height="39" name="Undiscovered\nDirty Data"/>
+				<stock label_side="center" x="458.5" y="483.5" width="66" height="38" name="Clean\nEntries"/>
+				<flow x="331.25" y="585" name="Entering Data">
+					<pts>
+						<pt x="296.5" y="585"/>
+						<pt x="390" y="585"/>
+					</pts>
+				</flow>
+				<flow x="374.5" y="742" name="Discovering Errors">
+					<pts>
+						<pt x="490" y="690.5"/>
+						<pt x="490" y="742"/>
+						<pt x="259" y="742"/>
+						<pt x="259" y="606.5"/>
+					</pts>
+				</flow>
+				<flow x="419.75" y="671" name="Entering with\nErrors">
+					<pts>
+						<pt x="381" y="671"/>
+						<pt x="458.5" y="671"/>
+					</pts>
+				</flow>
+				<flow x="419.75" y="497" name="Entering without\nErrors">
+					<pts>
+						<pt x="381" y="497"/>
+						<pt x="458.5" y="497"/>
+					</pts>
+				</flow>
+				<connector uid="13" angle="81.4692">
+					<from>Entering_Data</from>
+					<to>Entering_without_Errors</to>
+				</connector>
+				<connector uid="14" angle="272.862">
+					<from>Entering_Data</from>
+					<to>Entering_with_Errors</to>
+				</connector>
+				<connector uid="15" angle="237.465">
+					<from>Undiscovered_Dirty_Data</from>
+					<to>Discovering_Errors</to>
+				</connector>
+				<connector uid="16" angle="43.0251">
+					<from>Data_to_Enter</from>
+					<to>Entering_Data</to>
+				</connector>
+				<aux x="305.5" y="497" name="FR Entering Data"/>
+				<connector uid="17" angle="302.535">
+					<from>FR_Entering_Data</from>
+					<to>Entering_Data</to>
+				</connector>
+				<flow x="180.625" y="579" name="Collecting Data">
+					<pts>
+						<pt x="144.75" y="579"/>
+						<pt x="228.5" y="579"/>
+					</pts>
+				</flow>
+				<aux x="180.625" y="653" name="FR Collecting Data"/>
+				<connector uid="18" angle="90">
+					<from>FR_Collecting_Data</from>
+					<to>Collecting_Data</to>
+				</connector>
+				<aux label_side="right" x="574" y="307" name="Data Entry\nQuality"/>
+				<connector uid="19" angle="160.201">
+					<from>
+						<alias uid="2"/>
+					</from>
+					<to>Accomplishing_Correctly</to>
+				</connector>
+				<connector uid="20" angle="180">
+					<from>
+						<alias uid="2"/>
+					</from>
+					<to>Accomplishing_incorrectly</to>
+				</connector>
+				<aux label_side="right" x="574" y="265" name="AT discovering Errors"/>
+				<connector uid="21" angle="90">
+					<from>
+						<alias uid="3"/>
+					</from>
+					<to>Discovering_Rework</to>
+				</connector>
+				<aux label_side="right" x="574" y="109" name="INIT Work to Do"/>
+				<aux label_side="right" x="574" y="164.5" name="INIT Correct work"/>
+				<aux label_side="right" x="574" y="215" name="INIT Undiscovered\nRework"/>
+				<aux label_side="right" x="575" y="754" name="Data Entry\nQuality 1"/>
+				<aux label_side="right" x="575" y="712" name="AT Discover Errors"/>
+				<aux label_side="right" x="575" y="556" name="INIT Data to Enter"/>
+				<aux label_side="right" x="575" y="611.5" name="INIT Clean Interviews"/>
+				<aux label_side="right" x="575" y="662" name="INIT Undiscovered\nDirty Data"/>
+				<connector uid="22" angle="78.6901">
+					<from>
+						<alias uid="6"/>
+					</from>
+					<to>Discovering_Errors</to>
+				</connector>
+				<connector uid="23" angle="146.31">
+					<from>
+						<alias uid="5"/>
+					</from>
+					<to>Entering_without_Errors</to>
+				</connector>
+				<connector uid="24" angle="198.435">
+					<from>
+						<alias uid="5"/>
+					</from>
+					<to>Entering_with_Errors</to>
+				</connector>
+				<stock label_side="center" x="85.75" y="561.5" width="59" height="45" name="Interview\nBacklog"/>
+				<aux label_side="right" x="575" y="498" name="INIT Interviews\nto complete"/>
+				<connector uid="25" angle="39.9739">
+					<from>Interview_Backlog</from>
+					<to>Collecting_Data</to>
+				</connector>
+				<aux label_side="right" x="575" y="810" name="Ref Mode"/>
+				<alias font_style="italic" uid="2" x="406" y="184" width="18" height="18">
+					<of>Data_Entry_Quality</of>
+				</alias>
+				<alias color="blue" background="white" font_style="italic" uid="3" x="289.5" y="393" width="18" height="18">
+					<shape type="circle" radius="18"/>
+					<of>AT_discovering_Errors</of>
+				</alias>
+				<alias font_style="italic" uid="6" x="367" y="796" width="18" height="18">
+					<of>AT_Discover_Errors</of>
+				</alias>
+				<alias font_style="italic" uid="5" x="473" y="574" width="18" height="18">
+					<of>Data_Entry_Quality_1</of>
+				</alias>
+			</view>
+		</views>
+	</model>
+	<isee:controls>
+		<isee:control priority="interactive" name="Data_Entry_Quality" value="0.485687713237825"/>
+	</isee:controls>
+</xmile>
+
